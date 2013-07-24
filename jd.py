@@ -1,12 +1,10 @@
 # coding=gbk
 '''
 Created on 2013-7-23
-
+jd的配置文件
 @author: gudh
 '''
 import time
-import types
-import md5
 
 addlebkurl = "http://cread.e.jd.com/openread/openRead.action?callback=jsonp%d053&_=%d850&bookId=%s&readType=0"
 bookurl = "http://e.jd.com/%s.html"
@@ -27,35 +25,6 @@ def getaddbookurl(bookId):
 def getbookurl(bookId):
     return bookurl % bookId
 
-def getmd5(string):
-    m = md5.new(string)
-    m.digest()
-    return m.hexdigest()
 
-class Book():
-    '''书类，记录一本书的所有信息'''
-    def __init__(self, jdId=""):
-        self.id = "" #id
-        self.jdid = jdId #京东的ID
-        self.name = "" #名称
-        self.author = "" #作者
-        self.cate = "" #分类
-        self.desc = "" #描述
-        self.coverurl = "" #封面图片
-        self.chapters = [] #章节列表，包括章节名称和数量
-        self.num = 0 # 所有图片数量
-        
-    def setid(self):
-        '''根据书名和作者设置书的ID'''
-        key = self.name + "#" + self.author
-        self.id = getmd5(key)
-    
-    def str(self):
-        '''打印当前类的信息'''
-        for (a, b) in self.__dict__.items():
-            if type(b) is types.ListType:
-                for (m,n) in b:
-                    n = n + 1 #无用，去掉该死的黄线
-                    print ":".join((a, m))
-            else:
-                print ":".join((a,str(b)))
+
+

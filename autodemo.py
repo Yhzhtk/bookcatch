@@ -1,7 +1,7 @@
 # coding=gbk
 '''
 Created on 2013-7-22
-使用win32操作示例
+使用win32操作Demo
 @author: gudh
 '''
 

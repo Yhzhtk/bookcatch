@@ -1,14 +1,15 @@
 # coding=gbk
 '''
 Created on 2013-7-23
-
+抓取书
 @author: gudh
 '''
-
 import re
 import urllib2
 import jd
-from jd import Book
+from bookmode import Shotbook,Chapter
+import bookorm
+
 
 def geturlcontent(url, headers={}):
     '''以指定UA获取网页内容'''
@@ -36,25 +37,26 @@ def addbook(bookId):
 
 def crawlbook(bookId):
     '''抓取并解析书的信息'''
-    book = Book(bookId)
+    book = Shotbook(bookId)
     url = jd.getbookurl(bookId)
     content = geturlcontent(url)
     
-    book.name = regexone(jd.namereg, content)
+    book.bookName = regexone(jd.namereg, content)
     book.author = regexone(jd.authorreg, content)
+    book.setnid() # 由书名和作者名生成nid
     catearea = regexone(jd.cateareareg, content)
     catelist = regexall(jd.catereg, catearea)
-    book.cate = catelist[len(catelist) - 1].replace("/", "").replace("、", "")
+    book.type = catelist[len(catelist) - 1].replace("/", "").replace("、", "")
     book.coverurl = regexone(jd.coverimgreg, content)
     desc = regexone(jd.descreg, content).replace("<br />"," ").replace("　","").replace(" ", "").strip()
     desc = re.sub("<.*?>", "", desc)
-    book.desc = desc
+    book.description = desc
     chapterarea = regexone(jd.chaptersreg, content)
-    book.chapters = [(line.strip(),0) for line in chapterarea.split("<br />")]
+    book.chapters = [Chapter(book.nid, str(i), line.strip(), book.bookName, book.author, 0) for (i,line) in enumerate(chapterarea.split("<br />"), 1)]
+    book.complete_chapter()
     
-    book.setid()
     return book
 
 book = crawlbook("30070740")
-book.str()
-    
+bookorm.insert_book(book)
+

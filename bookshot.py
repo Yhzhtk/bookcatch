@@ -1,7 +1,7 @@
-# coding=utf-8
+# coding=gbk
 '''
 Created on 2013-7-22
-
+ÅÄÊé²Ù×÷
 @author: gudh
 '''
 
@@ -11,11 +11,11 @@ import ImageGrab,Image
 import os
 
 def move(loc):
-    '''ç§»åŠ¨é¼ æ ‡'''
+    '''ÒÆ¶¯Êó±ê'''
     win32api.SetCursorPos(loc)
 
 def click(left=True):
-    '''å•å‡»é¼ æ ‡'''
+    '''µ¥»÷Êó±ê'''
     if left:
         d = win32con.MOUSEEVENTF_LEFTDOWN
         u = win32con.MOUSEEVENTF_LEFTUP
@@ -28,19 +28,19 @@ def click(left=True):
     time.sleep(0.01)
 
 def cut(dect):
-    '''å±å¹•æˆªå›¾'''
+    '''ÆÁÄ»½ØÍ¼'''
     im = ImageGrab.grab()
     im1 = im.crop(dect)
     return im1
 
 def save(img, path):
-    '''ä¿å­˜å›¾ç‰‡'''
+    '''±£´æÍ¼Æ¬'''
     img.save(path)
     spath = path.replace("high", "low")
     img.save(spath, 'JPEG', quality = 95)
 
 def white(img):
-    '''åˆ¤æ–­æ˜¯å¦æ˜¯å…¨ç™½è‰²'''
+    '''ÅĞ¶ÏÊÇ·ñÊÇÈ«°×É«'''
     size = img.size
     for x in range(size[0]):
         for y in range(size[1]):
@@ -50,14 +50,14 @@ def white(img):
     return True
 
 def prgb(img):
-    '''æ‰“å°æ‰€æœ‰RGB'''
+    '''´òÓ¡ËùÓĞRGB'''
     size = img.size
     for x in range(size[0]):
         for y in range(size[1]):
             print x,y,img.getpixel((x, y))
 
 def iscu(img, w, h, p):
-    '''æ˜¯å¦æ˜¯ç²—ä½“'''
+    '''ÊÇ·ñÊÇ´ÖÌå'''
     size = img.size
     arr = []
     for y in range(size[1]):
@@ -66,12 +66,12 @@ def iscu(img, w, h, p):
             pix = img.getpixel((x, y))
             r = False
             if pix[0] < p and pix[1] < p and pix[2] < p:
-                # åˆ¤æ–­åƒç´ ç‚¹æ˜¯å¦æ»¡è¶³é»‘çš„æ¡ä»¶
+                # ÅĞ¶ÏÏñËØµãÊÇ·ñÂú×ãºÚµÄÌõ¼ş
                 r = True
                 if x >= w and y >= h:
-                    # å¦‚æœå·²ç»è·å–çš„åƒç´ è¾¾åˆ°åˆ¤æ–­èŒƒå›´åˆ™è¿›è¡ŒèŒƒå›´åˆ¤æ–­
+                    # Èç¹ûÒÑ¾­»ñÈ¡µÄÏñËØ´ïµ½ÅĞ¶Ï·¶Î§Ôò½øĞĞ·¶Î§ÅĞ¶Ï
                     b = True
-                    # åœ¨ä»¥x,yä¸ºåæ ‡çš„å‰é¢w,hç‚¹å‡æ»¡è¶³æ¡ä»¶åˆ™åˆ¤æ–­æ˜¯ç²—ä½“ï¼Œå¦åˆ™è·³å‡ºç»§ç»­åˆ¤æ–­
+                    # ÔÚÒÔx,yÎª×ø±êµÄÇ°Ãæw,hµã¾ùÂú×ãÌõ¼şÔòÅĞ¶ÏÊÇ´ÖÌå£¬·ñÔòÌø³ö¼ÌĞøÅĞ¶Ï
                     for i in range(x-w, x):
                         for j in range(y-h, y):
                             b &= arr[j][i]
@@ -81,7 +81,7 @@ def iscu(img, w, h, p):
                         break
                     if b:
                         return True
-            # å°†å½“å‰åƒç´ ä¿¡æ¯è®°å½•åˆ°æ•°ç»„
+            # ½«µ±Ç°ÏñËØĞÅÏ¢¼ÇÂ¼µ½Êı×é
             arx.append(r)
         arr.append(arx)
     return False
@@ -90,7 +90,7 @@ def iscu(img, w, h, p):
 # img = cut(dect)
 # save(img, "c:/a.jpg")
 for i in range(202,206):
-    p = r"D:\dd\å¥½çˆ¶æ¯å†³å®šå­©å­ä¸€ç”Ÿ\high\%d.jpg".encode("gbk") % i
+    p = r"D:\dd\ºÃ¸¸Ä¸¾ö¶¨º¢×ÓÒ»Éú\high\%d.jpg".encode("gbk") % i
     if os.path.exists(p):
         img = Image.open(p)
         print p,iscu(img, 3, 3, 50)
