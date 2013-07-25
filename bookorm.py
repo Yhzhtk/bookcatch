@@ -61,6 +61,23 @@ def insert_chapter(chapters):
     except MySQLdb.Error,e:
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
+def exist_book(book_id):
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        conn.select_db(db_name)
+        # 判断Nid是否存在
+        sql = "select count(*) from " + book_table_name + " where jdid = %s" 
+        cur.execute(sql, book_id)
+        result = cur.fetchone()
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+    except MySQLdb.Error,e:
+        print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+    return result[0] != 0
+
 def select():
     '''查询数据库'''
     try:

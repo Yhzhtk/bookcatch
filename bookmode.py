@@ -18,6 +18,7 @@ class Shotbook():
     def __init__(self, jdid=""):
         # 数据库字段
         self.nid = "" #'小说id',
+        self.jdid = jdid #京东的ID
         self.bookName = "" # '小说名称',
         self.author = "" # '小说作者',
         self.coverImgPath = "" #'小说封面图片地址',
@@ -29,11 +30,10 @@ class Shotbook():
         self.updateTime = time.strftime("%Y-%m-%d %H:%M:%S") # '更新时间',
         self.isok = 0 #'是否建到索引中去，0为没有，1为已经建了',
         #非数据库字段
-        self.jdid = jdid #京东的ID
         self.coverurl = "" #封面图片Url
         self.chapters = [] #章节列表，包括章节名称和数量
         #需要过滤的字段
-        self.filter = ['jdid', "coverurl", "chapters", "filter"]
+        self.filter = ["coverurl", "chapters", "filter"]
         
     def set_id_coverpath(self):
         '''根据书名和作者设置书的ID'''

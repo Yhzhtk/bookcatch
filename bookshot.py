@@ -28,7 +28,7 @@ def click(left=True):
     time.sleep(0.01)
 
 def cut(dect):
-    '''фад╩╫ьм╪'''
+    '''╥╣╩ьфад╩╫ьм╪'''
     im = ImageGrab.grab()
     im1 = im.crop(dect)
     return im1
