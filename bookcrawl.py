@@ -10,6 +10,14 @@ import jd
 from bookmode import Shotbook,Chapter
 import bookorm
 
+def crawl_book(book_ids):
+    for bid in book_ids:
+        print "crawl book_id:%d" % bid
+        book = crawlbook(str(bid))
+        bookorm.insert_book(book)
+        bookorm.insert_chapter(book.chapters)
+        
+crawl_book(range(23001,23002))
 
 def geturlcontent(url, headers={}):
     '''以指定UA获取网页内容'''
@@ -43,7 +51,7 @@ def crawlbook(bookId):
     
     book.bookName = regexone(jd.namereg, content)
     book.author = regexone(jd.authorreg, content)
-    book.setnid() # 由书名和作者名生成nid
+    book.set_id_coverpath() # 由书名和作者名生成nid和封面路径
     catearea = regexone(jd.cateareareg, content)
     catelist = regexall(jd.catereg, catearea)
     book.type = catelist[len(catelist) - 1].replace("/", "").replace("、", "")
@@ -56,7 +64,4 @@ def crawlbook(bookId):
     book.complete_chapter()
     
     return book
-
-book = crawlbook("30070740")
-bookorm.insert_book(book)
 

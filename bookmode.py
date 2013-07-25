@@ -5,6 +5,7 @@ Created on 2013-7-24
 @author: gudh
 '''
 import md5
+import time
 
 def getmd5(string):
     '''获取字符串的MD5'''
@@ -25,7 +26,7 @@ class Shotbook():
         self.chapterList = "" # '章节列表',
         self.chapterCount = 0 # '章节总数',
         self.state = 1 # '小说状态 0，为连载，1为完结'，默认完结
-        self.updateTime = "" # '更新时间',
+        self.updateTime = time.strftime("%Y-%m-%d %H:%M:%S") # '更新时间',
         self.isok = 0 #'是否建到索引中去，0为没有，1为已经建了',
         #非数据库字段
         self.jdid = jdid #京东的ID
@@ -34,10 +35,13 @@ class Shotbook():
         #需要过滤的字段
         self.filter = ['jdid', "coverurl", "chapters", "filter"]
         
-    def setnid(self):
+    def set_id_coverpath(self):
         '''根据书名和作者设置书的ID'''
         key = self.bookName + "#" + self.author
-        self.nid = getmd5(key)
+        md5 = getmd5(key)
+        self.nid = md5
+        coverpath = md5[0:2] + "/" + md5[2:4] + "/" + md5[4:] + ".jpg"
+        self.coverImgPath = coverpath
     
     def complete_chapter(self):
         '''完善章节信息'''
@@ -64,10 +68,11 @@ class Chapter():
         self.bookName = bookName
         self.author = author
         self.imgCount = imgCount
+        #需要过滤的字段
+        self.filter = ["filter"]
 
     def str(self):
         '''打印当前类的信息'''
         for (a, b) in self.__dict__.items():
             print ":".join((a,str(b)))
-
 

@@ -18,6 +18,8 @@ coverimgreg = '''<div id="spec-n1" class="jqzoom"><img src="(.*?)"'''
 descreg = '''<h3>ÄÚÈÝ¼ò½é</h3>.*?<div class="con">(.*?)</div>'''
 chaptersreg = '''<h3>Ä¿Â¼</h3>.*?<div class="con">(.*?)</div>'''
 
+rootpath = "F:/ebook/"
+
 def getaddbookurl(bookId):
     t = int(time.time())
     return addlebkurl % (t,t+15320,bookId) 
