@@ -20,11 +20,11 @@ chaptersreg = '''<h3>Ŀ¼</h3>.*?<div class="con">(.*?)</div>'''
 
 rootpath = "F:/ebook/"
 
-def getaddbookurl(bookId):
+def get_addbook_url(bookId):
     t = int(time.time())
     return addlebkurl % (t,t+15320,bookId) 
 
-def getbookurl(bookId):
+def get_book_url(bookId):
     return bookurl % bookId
 
 

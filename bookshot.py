@@ -33,13 +33,13 @@ def cut(dect):
     im1 = im.crop(dect)
     return im1
 
-def save(img, path):
+def save(img, path, quality=100):
     '''保存图片'''
     img.save(path)
     spath = path.replace("high", "low")
-    img.save(spath, 'JPEG', quality = 95)
+    img.save(spath, 'JPEG', quality)
 
-def white(img):
+def is_white(img):
     '''判断是否是全白色'''
     size = img.size
     for x in range(size[0]):
@@ -49,14 +49,14 @@ def white(img):
                 return False
     return True
 
-def prgb(img):
+def print_rgb(img):
     '''打印所有RGB'''
     size = img.size
     for x in range(size[0]):
         for y in range(size[1]):
             print x,y,img.getpixel((x, y))
 
-def iscu(img, w, h, p):
+def is_bold(img, w, h, p):
     '''是否是粗体'''
     size = img.size
     arr = []
@@ -93,6 +93,5 @@ for i in range(202,206):
     p = r"D:\dd\好父母决定孩子一生\high\%d.jpg".encode("gbk") % i
     if os.path.exists(p):
         img = Image.open(p)
-        print p,iscu(img, 3, 3, 50)
-
+        print p,is_bold(img, 3, 3, 50)
 
