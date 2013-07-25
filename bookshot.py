@@ -7,8 +7,9 @@ Created on 2013-7-22
 
 import win32api,win32con,win32gui
 import time
-import ImageGrab,Image
+import ImageGrab
 import os
+import jd
 
 def move(loc):
     '''移动鼠标'''
@@ -27,26 +28,44 @@ def click(left=True):
     win32api.mouse_event(u, 0, 0)
     time.sleep(0.01)
 
+def double_click():
+    '''双击鼠标'''
+    click()
+    time.sleep(0.05)
+    click()
+
+def move_click_sleep(pos_sleep):
+    '''移动鼠标，点击，并延时'''
+    move(pos_sleep[0:2])
+    click()
+    time.sleep(pos_sleep[2])
+
+def move_double_click_sleep(pos_sleep):
+    '''移动鼠标，双击，并延时'''
+    move(pos_sleep[0:2])
+    double_click()
+    time.sleep(pos_sleep[2])
+
 def cut(dect):
     '''返回屏幕截图'''
     im = ImageGrab.grab()
     im1 = im.crop(dect)
     return im1
 
-def save(img, path, quality=100):
+def save(img, path, qualit=85):
     '''保存图片'''
-    img.save(path)
-    spath = path.replace("high", "low")
-    img.save(spath, 'JPEG', quality)
+    if not os.path.exists(os.path.split(path)[0]):
+        os.makedirs(os.path.split(path)[0])
+    img.save(path, 'JPEG', quality = qualit)
 
 def is_white(img):
     '''判断是否是全白色'''
     size = img.size
     for x in range(size[0]):
         for y in range(size[1]):
-            print img.getpixel((x, y))
             if img.getpixel((x, y)) != (255, 255, 255):
                 return False
+    print "iswhite true"
     return True
 
 def print_rgb(img):
@@ -86,12 +105,78 @@ def is_bold(img, w, h, p):
         arr.append(arx)
     return False
 
-# dect = (600, 600, 720, 720)
-# img = cut(dect)
-# save(img, "c:/a.jpg")
-for i in range(202,206):
-    p = r"D:\dd\好父母决定孩子一生\high\%d.jpg".encode("gbk") % i
-    if os.path.exists(p):
-        img = Image.open(p)
-        print p,is_bold(img, 3, 3, 50)
+def is_equal(img1, img2, jump=1):
+    '''判断两张图片是否一致'''
+    if img1 == None or img2 == None:
+        return False
+    size = img1.size
+    if size != img2.size:
+        return False
+    for y in range(0, size[1], jump):
+        for x in range(0, size[0], jump):
+            if img1.getpixel((x, y)) != img2.getpixel((x, y)):
+                return False
+    print "isequal true"
+    return True
+
+def shot_book(img_dect, next_pos_sleep, nid, cid):
+    '''拍书'''
+    flag = 0
+    path = jd.rootpath + time.strftime("%Y%m%d") + "/content/%s/" + nid[0:2] + "/" + nid[2:4] + "/" + nid[4:] + "/%s/%s.jpg"
+    last_img = None
+    i = 0
+    while True:
+        i += 1
+        img = cut(img_dect)
+        if is_white(img) or is_equal(img, last_img):
+            # 判断是否拍图到结束
+            flag += 1
+            if flag > 1:
+                break
+            else:
+                i -= 1
+                continue
+        else:
+            flag = 0
+        s_i = str(i)
+        if is_bold(img, 3, 3, 65):
+            s_i = s_i + "_b"
+        hpath = path % ("high", cid, s_i)
+        lpath = path % ("low", cid, s_i)
+        save(img, hpath)
+        save(img, lpath, 30)
+        print "save ok: " + hpath
+        # 记录上一张图片
+        last_img = img
+        # 翻页到下一张
+        move_click_sleep(next_pos_sleep)
+        
+
+def pos_to_first_book(down_time=10):
+    '''从上一本书的结尾定位到第一本畅读的阅读页'''
+    fhsj_pos_sleep = (109, 74, 1) # 返回书架位置
+    wdcd_pos_sleep = (118, 202, 1) # 我的畅读位置
+    sx_pos_sleep = (339, 79, 1) # 刷新
+    zxcd_first_pos_sleep = (492, 171, 1) # 在线畅读第一本数的位置
+    
+    move_click_sleep(fhsj_pos_sleep)
+    move_click_sleep(wdcd_pos_sleep)
+    move_click_sleep(sx_pos_sleep)
+    move_click_sleep(zxcd_first_pos_sleep)
+    move_double_click_sleep(zxcd_first_pos_sleep)
+    print "begin down book sleep: %d" % down_time
+    time.sleep(down_time) # 下载时间
+    move_double_click_sleep(zxcd_first_pos_sleep)
+
+def shot_first_book(nid, cid="1", down_time=10):
+    '''拍最前面一本书'''
+    pos_to_first_book(down_time)
+    dect = (158, 175, 607, 928) # 截图区域
+    next_pos_sleep = (666, 568, 0.2) # 下一页位置，延时
+    shot_book(dect, next_pos_sleep, nid, cid)
+
+if __name__ == '__main__':
+    time.sleep(2)
+    nid = "49be5990e3ec92ad8e9fcc3a25b391d2"
+    shot_first_book(nid)
 

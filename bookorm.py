@@ -184,5 +184,3 @@ def get_insert_sql_and_paras(table_name, obj, filter=[]):
     
     # 返回sql和参数
     return (sql, paras)
-
-#select()

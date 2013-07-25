@@ -17,6 +17,7 @@ catereg = '''<a .*?>(.*?)</a>'''
 coverimgreg = '''<div id="spec-n1" class="jqzoom"><img src="(.*?)"'''
 descreg = '''<h3>内容简介</h3>.*?<div class="con">(.*?)</div>'''
 chaptersreg = '''<h3>目录</h3>.*?<div class="con">(.*?)</div>'''
+sizereg = '''<div>文件大小：(.*?)M'''
 
 rootpath = "F:/ebook/"
 

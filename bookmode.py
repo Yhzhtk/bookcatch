@@ -32,8 +32,9 @@ class Shotbook():
         #非数据库字段
         self.coverurl = "" #封面图片Url
         self.chapters = [] #章节列表，包括章节名称和数量
+        self.bookSize = 500
         #需要过滤的字段
-        self.filter = ["coverurl", "chapters", "filter"]
+        self.filter = ["coverurl", "chapters", "bookSize", "filter"]
         
     def set_id_coverpath(self):
         '''根据书名和作者设置书的ID'''

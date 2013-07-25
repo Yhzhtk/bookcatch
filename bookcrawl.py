@@ -51,11 +51,22 @@ def crawl_book(bookId):
     catelist = regex_all(jd.catereg, catearea)
     book.type = catelist[len(catelist) - 1].replace("/", "").replace("、", "")
     book.coverurl = regex_one(jd.coverimgreg, content)
+    book.bookSize = int(float(regex_one(jd.sizereg, content)) * 1000)
     desc = regex_one(jd.descreg, content).replace("<br />"," ").replace("　","").replace(" ", "").strip()
     desc = re.sub("<.*?>", "", desc)
     book.description = desc
     chapterarea = regex_one(jd.chaptersreg, content)
-    book.chapters = [Chapter(book.nid, str(i), line.strip(), book.bookName, book.author, 0) for (i,line) in enumerate(chapterarea.split("<br />"), 1)]
+    # 处理章节中的尖括号
+    nchapters = []
+    for cc in chapterarea.split("<br />"):
+        if not cc:
+            continue
+        print cc
+        for c in re.split("</?p>", cc):
+            if c.strip():
+                nchapters.append(c.replace("    ","").strip())
+    book.chapters = [Chapter(book.nid, str(i), line, book.bookName, book.author, 0) for (i,line) in enumerate(nchapters, 1)]
+    # 完善章节信息
     book.complete_chapter()
     
     # 下载封面
@@ -67,6 +78,12 @@ def crawl_book(bookId):
     
     return book
 
+def insert_book(book):
+    '''book数据插入数据库'''
+    print "crawl complete, insert db"
+    bookorm.insert_book(book)
+    bookorm.insert_chapter(book.chapters)
+
 def crawl_insert_books(book_ids):
     '''抓取指定ID的信息并插入数据库'''
     for bid in book_ids:
@@ -76,12 +93,12 @@ def crawl_insert_books(book_ids):
                 print "%d has exist, continue" % bid
                 continue
             book = crawl_book(str(bid))
-            print "crawl complete, insert db"
-            bookorm.insert_book(book)
-            bookorm.insert_chapter(book.chapters)
+            insert_book(book)
         except Exception:
             exstr = traceback.format_exc()
             print exstr
-        
-crawl_insert_books(range(30022649,30022659))
+
+if __name__ == '__main__':
+    crawl_insert_books(range(30022649,30022659))
+
 
