@@ -19,8 +19,6 @@ descreg = '''<h3>内容简介</h3>.*?<div class="con">(.*?)</div>'''
 chaptersreg = '''<h3>目录</h3>.*?<div class="con">(.*?)</div>'''
 sizereg = '''<div>文件大小：(.*?)M'''
 
-rootpath = "F:/ebook/"
-
 def get_addbook_url(bookId):
     t = int(time.time())
     return addlebkurl % (t,t+15320,bookId) 

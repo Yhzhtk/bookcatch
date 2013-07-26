@@ -9,7 +9,7 @@ import win32api,win32con,win32gui
 import time
 import ImageGrab
 import os
-import jd
+import bookconfig
 
 def move(loc):
     '''移动鼠标'''
@@ -122,7 +122,7 @@ def is_equal(img1, img2, jump=1):
 def shot_book(img_dect, next_pos_sleep, nid, cid):
     '''拍书'''
     flag = 0
-    path = jd.rootpath + time.strftime("%Y%m%d") + "/content/%s/" + nid[0:2] + "/" + nid[2:4] + "/" + nid[4:] + "/%s/%s.jpg"
+    path = bookconfig.rootpath + time.strftime("%Y%m%d") + "/content/%s/" + nid[0:2] + "/" + nid[2:4] + "/" + nid[4:] + "/%s/%s.jpg"
     last_img = None
     i = 0
     while True:
@@ -154,26 +154,20 @@ def shot_book(img_dect, next_pos_sleep, nid, cid):
 
 def pos_to_first_book(down_time=10):
     '''从上一本书的结尾定位到第一本畅读的阅读页'''
-    fhsj_pos_sleep = (109, 74, 1) # 返回书架位置
-    wdcd_pos_sleep = (118, 202, 1) # 我的畅读位置
-    sx_pos_sleep = (339, 79, 1) # 刷新
-    zxcd_first_pos_sleep = (492, 171, 1) # 在线畅读第一本数的位置
     
-    move_click_sleep(fhsj_pos_sleep)
-    move_click_sleep(wdcd_pos_sleep)
-    move_click_sleep(sx_pos_sleep)
-    move_click_sleep(zxcd_first_pos_sleep)
-    move_double_click_sleep(zxcd_first_pos_sleep)
+    move_click_sleep(bookconfig.fhsj_pos_sleep)
+    move_click_sleep(bookconfig.wdcd_pos_sleep)
+    move_click_sleep(bookconfig.sx_pos_sleep)
+    move_click_sleep(bookconfig.zxcd_first_pos_sleep)
+    move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
     print "begin down book sleep: %d" % down_time
     time.sleep(down_time) # 下载时间
-    move_double_click_sleep(zxcd_first_pos_sleep)
+    move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
 
 def shot_first_book(nid, cid="1", down_time=10):
     '''拍最前面一本书'''
     pos_to_first_book(down_time)
-    dect = (158, 175, 607, 928) # 截图区域
-    next_pos_sleep = (666, 568, 0.2) # 下一页位置，延时
-    shot_book(dect, next_pos_sleep, nid, cid)
+    shot_book(bookconfig.dect, bookconfig.next_pos_sleep, nid, cid)
 
 if __name__ == '__main__':
     time.sleep(2)

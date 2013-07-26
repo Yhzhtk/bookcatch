@@ -6,18 +6,7 @@ Created on 2013-7-24
 '''
 
 import MySQLdb
-
-# 数据库连接参数
-host="localhost"
-port=3306
-user="root"
-passwd="314"
-charset="utf8"
-
-# 详细数据库信息
-db_name = "ebook"
-book_table_name = "shotbook"
-chapter_table_name = "chapter"
+import bookconfig
 
 def insert_book(book):
     '''插入一本书的信息到数据库'''
@@ -25,9 +14,9 @@ def insert_book(book):
         conn = get_conn()
         cur = conn.cursor()
         # 获取插入参数
-        sp = get_insert_sql_and_paras(book_table_name, book, book.filter)
+        sp = get_insert_sql_and_paras(bookconfig.book_table_name, book, book.filter)
         
-        conn.select_db(db_name)
+        conn.select_db(bookconfig.db_name)
         cur.execute(sp[0],sp[1])
         
         conn.commit()
@@ -44,10 +33,10 @@ def insert_chapter(chapters):
     try:
         conn = get_conn()
         cur = conn.cursor()
-        conn.select_db(db_name)
+        conn.select_db(bookconfig.db_name)
         
         # 获取插入语句
-        sql = get_insert_sql(chapter_table_name, chapters[0], chapters[0].filter)
+        sql = get_insert_sql(bookconfig.chapter_table_name, chapters[0], chapters[0].filter)
         
         for chapter in chapters:
             # 循环插入数据
@@ -65,9 +54,9 @@ def exist_book(book_id):
     try:
         conn = get_conn()
         cur = conn.cursor()
-        conn.select_db(db_name)
+        conn.select_db(bookconfig.db_name)
         # 判断Nid是否存在
-        sql = "select count(*) from " + book_table_name + " where jdid = %s" 
+        sql = "select count(*) from " + bookconfig.book_table_name + " where jdid = %s" 
         cur.execute(sql, book_id)
         result = cur.fetchone()
         
@@ -110,10 +99,13 @@ def select():
     except MySQLdb.Error,e:
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
-
 def get_conn():
     '''返回数据库连接，可以在此实现连接池'''
-    return MySQLdb.Connect(host=host,user=user,passwd=passwd,port=port,charset=charset)
+    return MySQLdb.Connect(host=bookconfig.host,
+                           user=bookconfig.user,
+                           passwd=bookconfig.passwd,
+                           port=bookconfig.port,
+                           charset=bookconfig.charset)
 
 def get_insert_paras(obj, filter=[]):
     '''获取指定对象的插入参数'''
@@ -124,7 +116,7 @@ def get_insert_paras(obj, filter=[]):
         if type(v) is int:
             paras.append(v)
         else:
-            paras.append(str(v).encode(charset))
+            paras.append(get_code_str(v))
     # 返回参数
     return paras
 
@@ -173,7 +165,7 @@ def get_insert_sql_and_paras(table_name, obj, filter=[]):
             paras.append(v)
         else:
             sql_part2 += "%s," # 否则都当成是字符串
-            paras.append(str(v).encode(charset))
+            paras.append(get_code_str(v))
             
     # 去除最后的逗号
     if len(sql_part1) > 1:
@@ -184,3 +176,8 @@ def get_insert_sql_and_paras(table_name, obj, filter=[]):
     
     # 返回sql和参数
     return (sql, paras)
+
+def get_code_str(s, ts="gbk", cs="utf-8"):
+    '''获取指定编码'''
+    return str(s).decode(ts).encode(cs)
+
