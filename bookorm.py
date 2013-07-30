@@ -7,6 +7,7 @@ Created on 2013-7-24
 
 import MySQLdb
 import bookconfig
+from bookmode import Shotbook,Chapter
 
 def insert_book(book):
     '''插入一本书的信息到数据库'''
@@ -50,6 +51,49 @@ def insert_chapter(chapters):
     except MySQLdb.Error,e:
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
+def delete_book(nid, del_chap=False):
+    '''删除书'''
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        conn.select_db(bookconfig.db_name)
+       
+        sql = "delete from %s where nid = '%s'" % (bookconfig.book_table_name, nid)
+        cur.execute(sql)
+        
+        if del_chap:
+            # 删除章节
+            sql = "delete from %s where nid = '%s'" % (bookconfig.chapter_table_name, nid)
+            cur.execute(sql)
+            
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return True
+    except MySQLdb.Error,e:
+        print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+    return False
+
+def delete_chapter(nid):
+    '''删除章节'''
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        conn.select_db(bookconfig.db_name)
+       
+        sql = "delete from %s where nid = '%s'" % (bookconfig.chapter_table_name, nid)
+        cur.execute(sql)
+            
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return True
+    except MySQLdb.Error,e:
+        print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+    return False
+
 def exist_book(book_id):
     try:
         conn = get_conn()
@@ -67,37 +111,69 @@ def exist_book(book_id):
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
     return result[0] != 0
 
-def select():
+def select_one(sql, get_chap=False):
     '''查询数据库'''
     try:
-        conn=MySQLdb.Connect(host='localhost',user='root',passwd='314',port=3306,charset='utf8')
-        cur=conn.cursor()
-        conn.select_db('python')
-        cur.execute('update test set info="' + '去'.encode("utf8") + '" where id=3')
-        count=cur.execute('select * from test')
-        print 'there has %s rows record' % count
+        conn = get_conn()
+        cur = conn.cursor()
+        conn.select_db(bookconfig.db_name)
+        count = cur.execute(sql)
+        print '%s # count: %d' % (sql,count)
+        result = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return get_mode_from_result(result, get_chap)
+    
+    except MySQLdb.Error,e:
+        print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
-        result=cur.fetchone()
-        print result
-        print 'ID: %s info %s' % result
+def select_many(sql, get_chap=False, start = 0, count = -1):
+    '''查询数据库, count=-1表示有多少取多少，为正数则为取的个数'''
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        conn.select_db(bookconfig.db_name)
+        co = cur.execute(sql)
+        print '%s # count: %d' % (sql,co)
 
-        results=cur.fetchmany(5)
+        if start > 0:
+            cur.scroll(0,mode='absolute')
+            
+        if count == -1:
+            results=cur.fetchall()
+        elif count > 0:
+            results=cur.fetchmany(count)
+        else:
+            raise Exception,"count need -1 or > 0"
+        
+        modes = []
         for r in results:
-            print r
-
-        print '=='*10
-        cur.scroll(0,mode='absolute')
-
-        results=cur.fetchall()
-        for r in results:
-            print r[1]
+            modes.append(get_mode_from_result(r, get_chap))
 
         conn.commit()
         cur.close()
         conn.close()
-
+        
+        return modes
     except MySQLdb.Error,e:
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+
+def get_book(nid, get_chap=False):
+    '''根据nid获取一本书'''
+    sql = "select * from %s where nid= '%s'" % (bookconfig.book_table_name, nid)
+    return select_one(sql, get_chap)
+
+def get_all_book(get_chap=False):
+    '''获取所有书籍'''
+    sql = "select * from " + bookconfig.book_table_name
+    return select_many(sql, get_chap)
+
+def get_chapter(nid):
+    '''根据nid获取一本书的所有章节'''
+    sql = "select * from %s where nid= '%s'" % (bookconfig.chapter_table_name, nid)
+    return select_many(sql, False)
 
 def get_conn():
     '''返回数据库连接，可以在此实现连接池'''
@@ -106,6 +182,24 @@ def get_conn():
                            passwd=bookconfig.passwd,
                            port=bookconfig.port,
                            charset=bookconfig.charset)
+
+def get_mode_from_result(result, get_chap):
+    '''从数据库查出来放如mode'''
+    mode = None
+    if len(result) == 13:
+        mode = Shotbook()
+        # 利用反射赋值
+        for (i,m) in enumerate(Shotbook.db_field_seq):
+            setattr(mode, m, result[i])
+        # 如果是书的信息默认获取所有章节
+        if get_chap:
+            sql = "select * from " + bookconfig.chapter_table_name + " where nid='%s'" % mode.nid
+            mode.chapters = select_many(sql)
+    elif len(result) == 6:
+        mode = Chapter()
+        for (i,m) in enumerate(Chapter.db_field_seq):
+            setattr(mode, m, result[i])
+    return mode
 
 def get_insert_paras(obj, filter=[]):
     '''获取指定对象的插入参数'''

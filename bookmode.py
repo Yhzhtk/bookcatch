@@ -15,6 +15,9 @@ def getmd5(string):
 
 class Shotbook():
     '''书类'''
+    
+    db_field_seq=("nid","jdid","bookName","author","coverImgPath","description","type","chapterList","chapterCount","imgCount","state","updateTime","isok")
+    
     def __init__(self, jdid=""):
         # 数据库字段
         self.nid = "" #'小说id',
@@ -26,6 +29,7 @@ class Shotbook():
         self.type = "" # '小说类型',
         self.chapterList = "" # '章节列表',
         self.chapterCount = 0 # '章节总数',
+        self.imgCount = 0 #图片数量
         self.state = 1 # '小说状态 0，为连载，1为完结'，默认完结
         self.updateTime = time.strftime("%Y-%m-%d %H:%M:%S") # '更新时间',
         self.isok = 0 #'是否建到索引中去，0为没有，1为已经建了',
@@ -49,19 +53,29 @@ class Shotbook():
         self.chapterList = '$-$'.join([c.cid + "#-#" + c.cTitle for c in self.chapters])
         self.chapterCount = len(self.chapters)
     
+    def upTime(self):
+        '''更新时间'''
+        self.updateTime = time.strftime("%Y-%m-%d %H:%M:%S") # '更新时间',
+    
     def str(self):
         '''打印当前类的信息'''
         for (a, b) in self.__dict__.items():
             if isinstance(b, list):
                 print "-"*10
                 for l in b:
-                    l.str()
-                    print "-"*10
+                    if isinstance(l, Chapter):
+                        l.str()
+                        print "-"*10
+                    else:
+                        print l
             else:
                 print ":".join((a,str(b)))
 
 class Chapter():
     '''章节类'''
+    
+    db_field_seq=("nid","cid","cTitle","bookName","author","imgCount")
+    
     def __init__(self, nid = "", cid = "", cTitle = "", bookName = "", author="", imgCount = 0):
         self.nid = nid
         self.cid = cid

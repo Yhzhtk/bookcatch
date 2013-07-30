@@ -9,7 +9,7 @@ import win32api,win32con,win32gui
 import time
 import ImageGrab
 import os
-import bookconfig
+import bookconfig,bookorm
 
 def move(loc):
     '''移动鼠标'''
@@ -132,6 +132,7 @@ def shot_book(img_dect, next_pos_sleep, nid, cid):
             # 判断是否拍图到结束
             flag += 1
             if flag > 1:
+                i -= 1
                 break
             else:
                 i -= 1
@@ -150,7 +151,12 @@ def shot_book(img_dect, next_pos_sleep, nid, cid):
         last_img = img
         # 翻页到下一张
         move_click_sleep(next_pos_sleep)
-        
+    
+    book = bookorm.get_book(nid)
+    book.imgCount = i
+    book.upTime()
+    bookorm.delete_book(book.nid)
+    bookorm.insert_book(book)
 
 def pos_to_first_book(down_time=10):
     '''从上一本书的结尾定位到第一本畅读的阅读页'''
