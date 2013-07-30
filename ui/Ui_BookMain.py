@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'F:\eclipse4.2\BookClient\BookMain.ui'
 #
-# Created: Tue Jul 30 10:45:34 2013
+# Created: Tue Jul 30 17:00:49 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,11 +26,11 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(855, 799)
+        MainWindow.resize(930, 799)
         self.centralWidget = QtGui.QWidget(MainWindow)
         self.centralWidget.setObjectName(_fromUtf8("centralWidget"))
-        self.verticalLayout_2 = QtGui.QVBoxLayout(self.centralWidget)
-        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
+        self.verticalLayout_3 = QtGui.QVBoxLayout(self.centralWidget)
+        self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
         self.splitter = QtGui.QSplitter(self.centralWidget)
         self.splitter.setOrientation(QtCore.Qt.Horizontal)
         self.splitter.setObjectName(_fromUtf8("splitter"))
@@ -44,21 +44,39 @@ class Ui_MainWindow(object):
         self.pBtn1 = QtGui.QPushButton(self.widget)
         self.pBtn1.setObjectName(_fromUtf8("pBtn1"))
         self.horizontalLayout.addWidget(self.pBtn1)
-        self.pBtn2 = QtGui.QPushButton(self.widget)
-        self.pBtn2.setObjectName(_fromUtf8("pBtn2"))
-        self.horizontalLayout.addWidget(self.pBtn2)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.bookListWidget = QtGui.QListWidget(self.widget)
+        self.bookListWidget.setBaseSize(QtCore.QSize(60, 0))
         self.bookListWidget.setObjectName(_fromUtf8("bookListWidget"))
         self.verticalLayout.addWidget(self.bookListWidget)
-        self.chapListWidget = QtGui.QListWidget(self.splitter)
+        self.widget1 = QtGui.QWidget(self.splitter)
+        self.widget1.setObjectName(_fromUtf8("widget1"))
+        self.verticalLayout_2 = QtGui.QVBoxLayout(self.widget1)
+        self.verticalLayout_2.setMargin(0)
+        self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
+        self.horizontalLayout_2 = QtGui.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
+        self.pBtn2 = QtGui.QPushButton(self.widget1)
+        self.pBtn2.setObjectName(_fromUtf8("pBtn2"))
+        self.horizontalLayout_2.addWidget(self.pBtn2)
+        self.pBtn3 = QtGui.QPushButton(self.widget1)
+        self.pBtn3.setObjectName(_fromUtf8("pBtn3"))
+        self.horizontalLayout_2.addWidget(self.pBtn3)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
+        self.chapListWidget = QtGui.QListWidget(self.widget1)
+        self.chapListWidget.setBaseSize(QtCore.QSize(60, 0))
         self.chapListWidget.setObjectName(_fromUtf8("chapListWidget"))
+        self.verticalLayout_2.addWidget(self.chapListWidget)
         self.imgTableWidget = QtGui.QTableWidget(self.splitter)
+        self.imgTableWidget.setBaseSize(QtCore.QSize(500, 0))
         self.imgTableWidget.setObjectName(_fromUtf8("imgTableWidget"))
         self.imgTableWidget.setColumnCount(0)
         self.imgTableWidget.setRowCount(0)
-        self.verticalLayout_2.addWidget(self.splitter)
+        self.verticalLayout_3.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralWidget)
+        self.statusBar = QtGui.QStatusBar(MainWindow)
+        self.statusBar.setObjectName(_fromUtf8("statusBar"))
+        MainWindow.setStatusBar(self.statusBar)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -67,6 +85,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.pBtn1.setText(_translate("MainWindow", "Refresh", None))
         self.pBtn2.setText(_translate("MainWindow", "Save", None))
+        self.pBtn3.setText(_translate("MainWindow", "Clear", None))
 
 
 if __name__ == "__main__":
