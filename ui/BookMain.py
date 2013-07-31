@@ -183,6 +183,13 @@ class BookMain(QMainWindow, Ui_MainWindow):
             self.show_status(self.decode("清除分章: %s") % (ss))
         else:
             self.show_status(self.decode("请选择一张图片进行操作"))
+            
+    @pyqtSignature("")
+    def on_upCoverBtn_clicked(self):
+        date = self.createTimeEdit.text()[0:10].replace("-", "")
+        nid = self.nidEdit.text()
+        cover_path = day_path % date + "cover/" + nid[0:2] + "/" + nid[2:4] + "/"
+        os.startfile(cover_path)
 
     @pyqtSignature("")
     def on_saveBookInfoBtn_clicked(self):
