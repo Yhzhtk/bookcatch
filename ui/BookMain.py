@@ -4,15 +4,14 @@
 Module implementing BookMain.
 """
 
-from PyQt4.QtGui import QMainWindow,QListWidgetItem,QTableWidgetItem,QPixmap,QLabel
-from PyQt4.QtCore import pyqtSignature
-
+from PyQt4.QtGui import QMainWindow,QListWidgetItem,QTableWidgetItem,QPixmap,QLabel,QFont,QBrush
+from PyQt4.QtCore import pyqtSignature,Qt
 from Ui_BookMain import Ui_MainWindow
-
+import os
 # yh.book指上级目录，包就没放进来了
-from yh.book import bookorm
+from yh.book import bookorm,bookconfig
 
-root_path = "D:/dd/mm/low/" # 测试使用路径
+day_path = bookconfig.rootpath + "%s/content/low/"  # 测试使用路径
 cc = 5 # 默认选图列数
 w = 200 # 默认图像宽度
 h = 333 # 默认图像高度
@@ -55,8 +54,8 @@ class BookMain(QMainWindow, Ui_MainWindow):
             r += 1
         return (r, c)
     
-    def decode(self, str):
-        return str.decode("utf-8")
+    def decode(self, string):
+        return string.decode("utf-8")
     
     def show_status(self, msg):
         '''状态栏显示消息'''
@@ -85,7 +84,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
         (tr, c) = self.__get_current_tr_c()
         if (tr, c) != (-1, -1):
             ss = str(self.__get_index(cc, tr - 1, c))
-            self.imgTableWidget.item(tr, c).setText(ss)
+            self.imgTableWidget.setItem(tr, c, QTableWidgetItem(ss))
             self.show_status(self.decode("清除分章: %s") % (ss))
         else:
             self.show_status(self.decode("请选择一张图片进行操作"))
@@ -112,8 +111,15 @@ class BookMain(QMainWindow, Ui_MainWindow):
         self.imgTableWidget.setColumnCount(5)
         self.imgTableWidget.setRowCount(rc * 2)
         
+        date = book.createTime[0:10].replace("-", "")
+        book_path = day_path % date + book.nid[0:2] + "/" + book.nid[2:4] + "/" + book.nid[4:] + "/1/%s.jpg"
+        
         for i in range(1, book.imgCount + 1):
-            path = root_path + "%d.jpg" % i
+            split = False
+            path = book_path % str(i)
+            if not os.path.exists(path):
+                path = book_path % (str(i) + "_b")
+                split = True
             (r, c) = self.__get_r_c(cc, i)
             tr = r + 1
             self.imgTableWidget.setColumnWidth(c,w)
@@ -121,10 +127,15 @@ class BookMain(QMainWindow, Ui_MainWindow):
             self.imgTableWidget.setRowHeight(tr,20)
             
             # 设置图片和下临文字
-            item = QTableWidgetItem(str(i))
-            item.setData(1, QPixmap(path).scaled(w, h))
+            item = QTableWidgetItem(path)
+            if os.path.exists(path):
+                item.setData(1, QPixmap(path).scaled(w, h))
             self.imgTableWidget.setItem(r, c, item)
-            self.imgTableWidget.setItem(tr, c, QTableWidgetItem(str(i)))
+            item = QTableWidgetItem(str(i))
+            if split:
+                item.setFont(QFont("黑体", 12, QFont.Bold))
+                item.setForeground(QBrush(Qt.red))
+            self.imgTableWidget.setItem(tr, c, item)
         self.show_status(self.decode("加载成功。"))
     
     @pyqtSignature("QModelIndex")
@@ -134,7 +145,10 @@ class BookMain(QMainWindow, Ui_MainWindow):
         chap_name = select_text.split("#")[0].split(self.decode("。"))[1].strip()
         (tr, c) = self.__get_current_tr_c()
         if (tr, c) != (-1, -1):
-            self.imgTableWidget.item(tr, c).setText(chap_name)
+            item = QTableWidgetItem(chap_name)
+            item.setFont(QFont("黑体", 12, QFont.Bold))
+            item.setForeground(QBrush(Qt.red))
+            self.imgTableWidget.setItem(tr, c, item)
             self.show_status(self.decode("设定分章 %d : %s") % (self.__get_index(cc, tr, c), chap_name))
         else:
             self.show_status(self.decode("请选择一张图片进行操作"))

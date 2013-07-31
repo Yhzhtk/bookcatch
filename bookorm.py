@@ -186,7 +186,7 @@ def get_conn():
 def get_mode_from_result(result, get_chap):
     '''从数据库查出来放如mode'''
     mode = None
-    if len(result) == 13:
+    if len(result) == 15:
         mode = Shotbook()
         # 利用反射赋值
         for (i,m) in enumerate(Shotbook.db_field_seq):

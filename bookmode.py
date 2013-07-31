@@ -16,7 +16,7 @@ def getmd5(string):
 class Shotbook():
     '''书类'''
     
-    db_field_seq=("nid","jdid","bookName","author","coverImgPath","description","type","chapterList","chapterCount","imgCount","state","updateTime","isok")
+    db_field_seq=("nid","jdid","bookName","author","coverImgPath","description","type","chapterList","chapterCount","imgCount","state","createTime","updateTime","chapterok","isok")
     
     def __init__(self, jdid=""):
         # 数据库字段
@@ -31,7 +31,9 @@ class Shotbook():
         self.chapterCount = 0 # '章节总数',
         self.imgCount = 0 #图片数量
         self.state = 1 # '小说状态 0，为连载，1为完结'，默认完结
-        self.updateTime = time.strftime("%Y-%m-%d %H:%M:%S") # '更新时间',
+        self.createTime = time.strftime("%Y-%m-%d %H:%M:%S") # 创建时间
+        self.updateTime = time.strftime("%Y-%m-%d %H:%M:%S") # '更新时间'
+        self.chapterok = 0 # 分章是否完成，0没有，1完成
         self.isok = 0 #'是否建到索引中去，0为没有，1为已经建了',
         #非数据库字段
         self.coverurl = "" #封面图片Url
@@ -73,7 +75,6 @@ class Shotbook():
 
 class Chapter():
     '''章节类'''
-    
     db_field_seq=("nid","cid","cTitle","bookName","author","imgCount")
     
     def __init__(self, nid = "", cid = "", cTitle = "", bookName = "", author="", imgCount = 0):
