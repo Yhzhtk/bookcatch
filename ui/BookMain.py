@@ -193,9 +193,30 @@ class BookMain(QMainWindow, Ui_MainWindow):
 
     @pyqtSignature("")
     def on_saveBookInfoBtn_clicked(self):
-        """保存"""
-        # TODO: not implemented yet
-        raise NotImplementedError
+        """保存书籍信息"""
+        try:
+            nid = self.nidEdit.text()
+            book = bookorm.get_book(nid, False)
+            bookName = str(self.bookNameEdit.text())
+            if bookName:
+                book.bookName = bookName
+            author = str(self.authorEdit.text())
+            if author:
+                book.author = author
+            btype = str(self.typeEdit.text())
+            if btype:
+                book.type = btype
+            desc = str(self.descriptionEdit.toPlainText())
+            if desc:
+                book.description = desc
+            book.str()
+            # 先删除在插入
+            bookorm.save_book(book)
+            
+            self.show_status(self.decode("修改书籍信息成功: %s %s" % (nid, bookName)))
+        except Exception, e:
+            print self.decode("保存出错了：%s" % str(e))
+            self.show_status(self.decode("保存出错了：%s" % str(e)))
     
     @pyqtSignature("")
     def on_previousBtn_clicked(self):

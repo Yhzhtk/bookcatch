@@ -1,7 +1,7 @@
-# coding=gbk
+# coding=utf-8
 '''
 Created on 2013-7-22
-ÅÄÊé²Ù×÷
+æ‹ä¹¦æ“ä½œ
 @author: gudh
 '''
 
@@ -12,11 +12,11 @@ import os
 import bookconfig,bookorm
 
 def move(loc):
-    '''ÒÆ¶¯Êó±ê'''
+    '''ç§»åŠ¨é¼ æ ‡'''
     win32api.SetCursorPos(loc)
 
 def click(left=True):
-    '''µ¥»÷Êó±ê'''
+    '''å•å‡»é¼ æ ‡'''
     if left:
         d = win32con.MOUSEEVENTF_LEFTDOWN
         u = win32con.MOUSEEVENTF_LEFTUP
@@ -29,37 +29,37 @@ def click(left=True):
     time.sleep(0.01)
 
 def double_click():
-    '''Ë«»÷Êó±ê'''
+    '''åŒå‡»é¼ æ ‡'''
     click()
     time.sleep(0.05)
     click()
 
 def move_click_sleep(pos_sleep):
-    '''ÒÆ¶¯Êó±ê£¬µã»÷£¬²¢ÑÓÊ±'''
+    '''ç§»åŠ¨é¼ æ ‡ï¼Œç‚¹å‡»ï¼Œå¹¶å»¶æ—¶'''
     move(pos_sleep[0:2])
     click()
     time.sleep(pos_sleep[2])
 
 def move_double_click_sleep(pos_sleep):
-    '''ÒÆ¶¯Êó±ê£¬Ë«»÷£¬²¢ÑÓÊ±'''
+    '''ç§»åŠ¨é¼ æ ‡ï¼ŒåŒå‡»ï¼Œå¹¶å»¶æ—¶'''
     move(pos_sleep[0:2])
     double_click()
     time.sleep(pos_sleep[2])
 
 def cut(dect):
-    '''·µ»ØÆÁÄ»½ØÍ¼'''
+    '''è¿”å›å±å¹•æˆªå›¾'''
     im = ImageGrab.grab()
     im1 = im.crop(dect)
     return im1
 
 def save(img, path, qualit=85):
-    '''±£´æÍ¼Æ¬'''
+    '''ä¿å­˜å›¾ç‰‡'''
     if not os.path.exists(os.path.split(path)[0]):
         os.makedirs(os.path.split(path)[0])
     img.save(path, 'JPEG', quality = qualit)
 
 def is_white(img):
-    '''ÅĞ¶ÏÊÇ·ñÊÇÈ«°×É«'''
+    '''åˆ¤æ–­æ˜¯å¦æ˜¯å…¨ç™½è‰²'''
     size = img.size
     for x in range(size[0]):
         for y in range(size[1]):
@@ -69,14 +69,14 @@ def is_white(img):
     return True
 
 def print_rgb(img):
-    '''´òÓ¡ËùÓĞRGB'''
+    '''æ‰“å°æ‰€æœ‰RGB'''
     size = img.size
     for x in range(size[0]):
         for y in range(size[1]):
             print x,y,img.getpixel((x, y))
 
 def is_bold(img, w, h, p):
-    '''ÊÇ·ñÊÇ´ÖÌå'''
+    '''æ˜¯å¦æ˜¯ç²—ä½“'''
     size = img.size
     arr = []
     for y in range(size[1]):
@@ -85,12 +85,12 @@ def is_bold(img, w, h, p):
             pix = img.getpixel((x, y))
             r = False
             if pix[0] < p and pix[1] < p and pix[2] < p:
-                # ÅĞ¶ÏÏñËØµãÊÇ·ñÂú×ãºÚµÄÌõ¼ş
+                # åˆ¤æ–­åƒç´ ç‚¹æ˜¯å¦æ»¡è¶³é»‘çš„æ¡ä»¶
                 r = True
                 if x >= w and y >= h:
-                    # Èç¹ûÒÑ¾­»ñÈ¡µÄÏñËØ´ïµ½ÅĞ¶Ï·¶Î§Ôò½øĞĞ·¶Î§ÅĞ¶Ï
+                    # å¦‚æœå·²ç»è·å–çš„åƒç´ è¾¾åˆ°åˆ¤æ–­èŒƒå›´åˆ™è¿›è¡ŒèŒƒå›´åˆ¤æ–­
                     b = True
-                    # ÔÚÒÔx,yÎª×ø±êµÄÇ°Ãæw,hµã¾ùÂú×ãÌõ¼şÔòÅĞ¶ÏÊÇ´ÖÌå£¬·ñÔòÌø³ö¼ÌĞøÅĞ¶Ï
+                    # åœ¨ä»¥x,yä¸ºåæ ‡çš„å‰é¢w,hç‚¹å‡æ»¡è¶³æ¡ä»¶åˆ™åˆ¤æ–­æ˜¯ç²—ä½“ï¼Œå¦åˆ™è·³å‡ºç»§ç»­åˆ¤æ–­
                     for i in range(x-w, x):
                         for j in range(y-h, y):
                             b &= arr[j][i]
@@ -100,13 +100,13 @@ def is_bold(img, w, h, p):
                         break
                     if b:
                         return True
-            # ½«µ±Ç°ÏñËØĞÅÏ¢¼ÇÂ¼µ½Êı×é
+            # å°†å½“å‰åƒç´ ä¿¡æ¯è®°å½•åˆ°æ•°ç»„
             arx.append(r)
         arr.append(arx)
     return False
 
 def is_equal(img1, img2, jump=1):
-    '''ÅĞ¶ÏÁ½ÕÅÍ¼Æ¬ÊÇ·ñÒ»ÖÂ'''
+    '''åˆ¤æ–­ä¸¤å¼ å›¾ç‰‡æ˜¯å¦ä¸€è‡´'''
     if img1 == None or img2 == None:
         return False
     size = img1.size
@@ -120,7 +120,7 @@ def is_equal(img1, img2, jump=1):
     return True
 
 def shot_book(img_dect, next_pos_sleep, nid, cid):
-    '''ÅÄÊé'''
+    '''æ‹ä¹¦'''
     flag = 0
     path = bookconfig.rootpath + time.strftime("%Y%m%d") + "/content/%s/" + nid[0:2] + "/" + nid[2:4] + "/" + nid[4:] + "/%s/%s.jpg"
     last_img = None
@@ -129,7 +129,7 @@ def shot_book(img_dect, next_pos_sleep, nid, cid):
         i += 1
         img = cut(img_dect)
         if is_white(img) or is_equal(img, last_img):
-            # ÅĞ¶ÏÊÇ·ñÅÄÍ¼µ½½áÊø
+            # åˆ¤æ–­æ˜¯å¦æ‹å›¾åˆ°ç»“æŸ
             flag += 1
             if flag > 1:
                 i -= 1
@@ -147,9 +147,9 @@ def shot_book(img_dect, next_pos_sleep, nid, cid):
         save(img, hpath)
         save(img, lpath, 30)
         print "save ok: " + hpath
-        # ¼ÇÂ¼ÉÏÒ»ÕÅÍ¼Æ¬
+        # è®°å½•ä¸Šä¸€å¼ å›¾ç‰‡
         last_img = img
-        # ·­Ò³µ½ÏÂÒ»ÕÅ
+        # ç¿»é¡µåˆ°ä¸‹ä¸€å¼ 
         move_click_sleep(next_pos_sleep)
     
     book = bookorm.get_book(nid)
@@ -159,7 +159,7 @@ def shot_book(img_dect, next_pos_sleep, nid, cid):
     bookorm.insert_book(book)
 
 def pos_to_first_book(down_time=10):
-    '''´ÓÉÏÒ»±¾ÊéµÄ½áÎ²¶¨Î»µ½µÚÒ»±¾³©¶ÁµÄÔÄ¶ÁÒ³'''
+    '''ä»ä¸Šä¸€æœ¬ä¹¦çš„ç»“å°¾å®šä½åˆ°ç¬¬ä¸€æœ¬ç•…è¯»çš„é˜…è¯»é¡µ'''
     
     move_click_sleep(bookconfig.fhsj_pos_sleep)
     move_click_sleep(bookconfig.wdcd_pos_sleep)
@@ -167,11 +167,11 @@ def pos_to_first_book(down_time=10):
     move_click_sleep(bookconfig.zxcd_first_pos_sleep)
     move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
     print "begin down book sleep: %d" % down_time
-    time.sleep(down_time) # ÏÂÔØÊ±¼ä
+    time.sleep(down_time) # ä¸‹è½½æ—¶é—´
     move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
 
 def shot_first_book(nid, cid="1", down_time=10):
-    '''ÅÄ×îÇ°ÃæÒ»±¾Êé'''
+    '''æ‹æœ€å‰é¢ä¸€æœ¬ä¹¦'''
     pos_to_first_book(down_time)
     shot_book(bookconfig.dect, bookconfig.next_pos_sleep, nid, cid)
 

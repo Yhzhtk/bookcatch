@@ -1,40 +1,40 @@
-# coding=gbk
+# coding=utf-8
 '''
 Created on 2013-7-22
-Ê¹ÓÃwin32²Ù×÷Demo
+ä½¿ç”¨win32æ“ä½œDemo
 @author: gudh
 '''
 
 import win32gui,win32api,win32con
 import time
 
-DialogName = "µÇÂ¼".encode("gbk")
-ButtonName = "µÇÂ¼".encode("gbk")
+DialogName = "ç™»å½•".encode("gbk")
+ButtonName = "ç™»å½•".encode("gbk")
 
-win = win32gui.FindWindow(0,DialogName) #»ñÈ¡´°¿Ú¾ä±ú£¬ÒÔ´°¿Útitle»ñÈ¡
-while win == 0: #Îª0±íÊ¾Ã»ÓĞÕÒµ½
+win = win32gui.FindWindow(0,DialogName) #è·å–çª—å£å¥æŸ„ï¼Œä»¥çª—å£titleè·å–
+while win == 0: #ä¸º0è¡¨ç¤ºæ²¡æœ‰æ‰¾åˆ°
     win = win32gui.FindWindow(0,DialogName)
     
-#win32api.MessageBox(0, "ÇëÏÈÔËĞĞ**".encode("gbk"), "´íÎó£¡".encode("gbk"), win32con.MB_ICONERROR)
-#win32api.SendMessage(win,16) #·¢ËÍ16ÊÇ¹Ø±Õ´°¿ÚµÄÒâË¼
+#win32api.MessageBox(0, "è¯·å…ˆè¿è¡Œ**".encode("gbk"), "é”™è¯¯ï¼".encode("gbk"), win32con.MB_ICONERROR)
+#win32api.SendMessage(win,16) #å‘é€16æ˜¯å…³é—­çª—å£çš„æ„æ€
 
-time.sleep(1) # ĞİÃßXÃë
-hbtn = win32gui.FindWindowEx(win,None,None,ButtonName) #»ñÈ¡°´Å¥¾ä±ú
-(left,top,right,bottom) = win32gui.GetWindowRect(hbtn) #»ñÈ¡°´Å¥ÇøÓò
-win32api.SetCursorPos((left+(right-left)/2,top+(bottom-top)/2)) #¹â±ê¶¨Î»°´Å¥
+time.sleep(1) # ä¼‘çœ Xç§’
+hbtn = win32gui.FindWindowEx(win,None,None,ButtonName) #è·å–æŒ‰é’®å¥æŸ„
+(left,top,right,bottom) = win32gui.GetWindowRect(hbtn) #è·å–æŒ‰é’®åŒºåŸŸ
+win32api.SetCursorPos((left+(right-left)/2,top+(bottom-top)/2)) #å…‰æ ‡å®šä½æŒ‰é’®
 time.sleep(0.5)
 
-# Êó±êµã»÷
+# é¼ æ ‡ç‚¹å‡»
 win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0) 
 time.sleep(0.05)
 win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0)
 time.sleep(0.05)
 
-#»ñÈ¡ºÍÒÆ¶¯Êó±êÎ»ÖÃ
+#è·å–å’Œç§»åŠ¨é¼ æ ‡ä½ç½®
 oldCursorPos = win32gui.GetCursorPos()
 win32api.SetCursorPos((1,1))
 
-#ÉÏÃæ´úÂëÂıÇÒÈİÒ×³ö´í£¬¿ÉÒÔÖ±½ÓÓÃ·¢ÏûÏ¢µÄ·½Ê½£¬¸ü¿ìÒ²²»ÈİÒ×³ö´í£º
+#ä¸Šé¢ä»£ç æ…¢ä¸”å®¹æ˜“å‡ºé”™ï¼Œå¯ä»¥ç›´æ¥ç”¨å‘æ¶ˆæ¯çš„æ–¹å¼ï¼Œæ›´å¿«ä¹Ÿä¸å®¹æ˜“å‡ºé”™ï¼š
 savewin = win32gui.FindWindow(None,'Save as...')
 inputfile = win32gui.GetDlgItem(savewin,0x47C)
 win32gui.SendMessage(inputfile,win32con.WM_SETTEXT,0,'result')

@@ -1,7 +1,7 @@
-# coding=gbk
+# coding=utf-8
 '''
 Created on 2013-7-24
-Êı¾İ¿â²Ù×÷Àà
+æ•°æ®åº“æ“ä½œç±»
 @author: gudh
 '''
 
@@ -10,14 +10,15 @@ import bookconfig
 from bookmode import Shotbook,Chapter
 
 def insert_book(book):
-    '''²åÈëÒ»±¾ÊéµÄĞÅÏ¢µ½Êı¾İ¿â'''
+    '''æ’å…¥ä¸€æœ¬ä¹¦çš„ä¿¡æ¯åˆ°æ•°æ®åº“'''
     try:
         conn = get_conn()
         cur = conn.cursor()
-        # »ñÈ¡²åÈë²ÎÊı
+        # è·å–æ’å…¥å‚æ•°
         sp = get_insert_sql_and_paras(bookconfig.book_table_name, book, book.filter)
         
         conn.select_db(bookconfig.db_name)
+        print sp[0]
         cur.execute(sp[0],sp[1])
         
         conn.commit()
@@ -28,7 +29,7 @@ def insert_book(book):
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
         
 def insert_chapter(chapters):
-    '''²åÈëÒ»±¾ÊéµÄËùÓĞÕÂ½ÚĞÅÏ¢µ½Êı¾İ¿â'''
+    '''æ’å…¥ä¸€æœ¬ä¹¦çš„æ‰€æœ‰ç« èŠ‚ä¿¡æ¯åˆ°æ•°æ®åº“'''
     if len(chapters) == 0:
         return
     try:
@@ -36,11 +37,12 @@ def insert_chapter(chapters):
         cur = conn.cursor()
         conn.select_db(bookconfig.db_name)
         
-        # »ñÈ¡²åÈëÓï¾ä
+        # è·å–æ’å…¥è¯­å¥
         sql = get_insert_sql(bookconfig.chapter_table_name, chapters[0], chapters[0].filter)
+        print sql
         
         for chapter in chapters:
-            # Ñ­»·²åÈëÊı¾İ
+            # å¾ªç¯æ’å…¥æ•°æ®
             paras = get_insert_paras(chapter, chapter.filter)
             cur.execute(sql, paras)
         
@@ -52,17 +54,18 @@ def insert_chapter(chapters):
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
 def delete_book(nid, del_chap=False):
-    '''É¾³ıÊé'''
+    '''åˆ é™¤ä¹¦'''
     try:
         conn = get_conn()
         cur = conn.cursor()
         conn.select_db(bookconfig.db_name)
        
         sql = "delete from %s where nid = '%s'" % (bookconfig.book_table_name, nid)
+        print sql
         cur.execute(sql)
         
         if del_chap:
-            # É¾³ıÕÂ½Ú
+            # åˆ é™¤ç« èŠ‚
             sql = "delete from %s where nid = '%s'" % (bookconfig.chapter_table_name, nid)
             cur.execute(sql)
             
@@ -76,15 +79,41 @@ def delete_book(nid, del_chap=False):
     return False
 
 def delete_chapter(nid):
-    '''É¾³ıÕÂ½Ú'''
+    '''åˆ é™¤ç« èŠ‚'''
     try:
         conn = get_conn()
         cur = conn.cursor()
         conn.select_db(bookconfig.db_name)
        
         sql = "delete from %s where nid = '%s'" % (bookconfig.chapter_table_name, nid)
+        print sql
         cur.execute(sql)
             
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return True
+    except MySQLdb.Error,e:
+        print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+    return False
+
+def save_book(book):
+    '''å…ˆåˆ é™¤ï¼Œå†æ’å…¥ï¼Œå¤±è´¥åˆ™å›æ»š'''
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        conn.select_db(bookconfig.db_name)
+       
+        sql = "delete from %s where nid = '%s'" % (bookconfig.book_table_name, book.nid)
+        print sql
+        cur.execute(sql)
+        
+        # è·å–æ’å…¥å‚æ•°
+        sp = get_insert_sql_and_paras(bookconfig.book_table_name, book, book.filter)
+        print sp[0]
+        cur.execute(sp[0],sp[1])
+        
         conn.commit()
         cur.close()
         conn.close()
@@ -99,7 +128,7 @@ def exist_book(book_id):
         conn = get_conn()
         cur = conn.cursor()
         conn.select_db(bookconfig.db_name)
-        # ÅĞ¶ÏNidÊÇ·ñ´æÔÚ
+        # åˆ¤æ–­Nidæ˜¯å¦å­˜åœ¨
         sql = "select count(*) from " + bookconfig.book_table_name + " where jdid = %s" 
         cur.execute(sql, book_id)
         result = cur.fetchone()
@@ -112,7 +141,7 @@ def exist_book(book_id):
     return result[0] != 0
 
 def select_one(sql, get_chap=False):
-    '''²éÑ¯Êı¾İ¿â'''
+    '''æŸ¥è¯¢æ•°æ®åº“'''
     try:
         conn = get_conn()
         cur = conn.cursor()
@@ -130,7 +159,7 @@ def select_one(sql, get_chap=False):
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
 def select_many(sql, get_chap=False, start = 0, count = -1):
-    '''²éÑ¯Êı¾İ¿â, count=-1±íÊ¾ÓĞ¶àÉÙÈ¡¶àÉÙ£¬ÎªÕıÊıÔòÎªÈ¡µÄ¸öÊı'''
+    '''æŸ¥è¯¢æ•°æ®åº“, count=-1è¡¨ç¤ºæœ‰å¤šå°‘å–å¤šå°‘ï¼Œä¸ºæ­£æ•°åˆ™ä¸ºå–çš„ä¸ªæ•°'''
     try:
         conn = get_conn()
         cur = conn.cursor()
@@ -161,37 +190,39 @@ def select_many(sql, get_chap=False, start = 0, count = -1):
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
 def get_book(nid, get_chap=False):
-    '''¸ù¾İnid»ñÈ¡Ò»±¾Êé'''
+    '''æ ¹æ®nidè·å–ä¸€æœ¬ä¹¦'''
     sql = "select * from %s where nid= '%s'" % (bookconfig.book_table_name, nid)
     return select_one(sql, get_chap)
 
 def get_all_book(get_chap=False):
-    '''»ñÈ¡ËùÓĞÊé¼®'''
+    '''è·å–æ‰€æœ‰ä¹¦ç±'''
     sql = "select * from " + bookconfig.book_table_name
     return select_many(sql, get_chap)
 
 def get_chapter(nid):
-    '''¸ù¾İnid»ñÈ¡Ò»±¾ÊéµÄËùÓĞÕÂ½Ú'''
+    '''æ ¹æ®nidè·å–ä¸€æœ¬ä¹¦çš„æ‰€æœ‰ç« èŠ‚'''
     sql = "select * from %s where nid= '%s'" % (bookconfig.chapter_table_name, nid)
     return select_many(sql, False)
 
 def get_conn():
-    '''·µ»ØÊı¾İ¿âÁ¬½Ó£¬¿ÉÒÔÔÚ´ËÊµÏÖÁ¬½Ó³Ø'''
-    return MySQLdb.Connect(host=bookconfig.host,
+    '''è¿”å›æ•°æ®åº“è¿æ¥ï¼Œå¯ä»¥åœ¨æ­¤å®ç°è¿æ¥æ± '''
+    con = MySQLdb.Connect(host=bookconfig.host,
                            user=bookconfig.user,
                            passwd=bookconfig.passwd,
                            port=bookconfig.port,
                            charset=bookconfig.charset)
+    con.autocommit(False)
+    return con
 
 def get_mode_from_result(result, get_chap):
-    '''´ÓÊı¾İ¿â²é³öÀ´·ÅÈçmode'''
+    '''ä»æ•°æ®åº“æŸ¥å‡ºæ¥æ”¾å¦‚mode'''
     mode = None
     if len(result) == 15:
         mode = Shotbook()
-        # ÀûÓÃ·´Éä¸³Öµ
+        # åˆ©ç”¨åå°„èµ‹å€¼
         for (i,m) in enumerate(Shotbook.db_field_seq):
             setattr(mode, m, result[i])
-        # Èç¹ûÊÇÊéµÄĞÅÏ¢Ä¬ÈÏ»ñÈ¡ËùÓĞÕÂ½Ú
+        # å¦‚æœæ˜¯ä¹¦çš„ä¿¡æ¯é»˜è®¤è·å–æ‰€æœ‰ç« èŠ‚
         if get_chap:
             sql = "select * from " + bookconfig.chapter_table_name + " where nid='%s'" % mode.nid
             mode.chapters = select_many(sql)
@@ -202,76 +233,76 @@ def get_mode_from_result(result, get_chap):
     return mode
 
 def get_insert_paras(obj, filter=[]):
-    '''»ñÈ¡Ö¸¶¨¶ÔÏóµÄ²åÈë²ÎÊı'''
+    '''è·å–æŒ‡å®šå¯¹è±¡çš„æ’å…¥å‚æ•°'''
     paras = []
     for (k,v) in obj.__dict__.items():
-        if k in filter: # ÅĞ¶ÏÊÇ·ñÊÇ¹ıÂËµÄ×Ö¶Î
+        if k in filter: # åˆ¤æ–­æ˜¯å¦æ˜¯è¿‡æ»¤çš„å­—æ®µ
             continue
         if type(v) is int:
             paras.append(v)
         else:
             paras.append(get_code_str(v))
-    # ·µ»Ø²ÎÊı
+    # è¿”å›å‚æ•°
     return paras
 
 def get_insert_sql(table_name, obj, filter=[]):
-    '''»ñÈ¡Ö¸¶¨¶ÔÏóµÄsql²åÈëÓï¾ä'''
+    '''è·å–æŒ‡å®šå¯¹è±¡çš„sqlæ’å…¥è¯­å¥'''
     sql = "insert into " + table_name + "(%s) values (%s)"
     sql_part1 = ""
     sql_part2 = ""
     for (k,v) in obj.__dict__.items():
-        if k in filter: # ÅĞ¶ÏÊÇ·ñÊÇ¹ıÂËµÄ×Ö¶Î
+        if k in filter: # åˆ¤æ–­æ˜¯å¦æ˜¯è¿‡æ»¤çš„å­—æ®µ
             continue
         sql_part1 += k + ","
         
         # The format string is not really a normal Python format string. You must always use %s for all fields.
-        # Õâ¸öÎÊÌâÀ§ÈÅÁËºÃ¾Ã£¬Ô­À´Õâ¸ö×ª»»ºÍPythonµÄ×ª»»²»Ò»Ñù£¬ËùÓĞ¶¼ÒªÓÃ%s£¬²»ÓÃ%d
+        # è¿™ä¸ªé—®é¢˜å›°æ‰°äº†å¥½ä¹…ï¼ŒåŸæ¥è¿™ä¸ªè½¬æ¢å’ŒPythonçš„è½¬æ¢ä¸ä¸€æ ·ï¼Œæ‰€æœ‰éƒ½è¦ç”¨%sï¼Œä¸ç”¨%d
         if type(v) is int:
-            sql_part2 += "%s," # Èç¹ûÊÇintÔòÊ¹ÓÃ %d
+            sql_part2 += "%s," # å¦‚æœæ˜¯intåˆ™ä½¿ç”¨ %d
         else:
-            sql_part2 += "%s," # ·ñÔò¶¼µ±³ÉÊÇ×Ö·û´®
+            sql_part2 += "%s," # å¦åˆ™éƒ½å½“æˆæ˜¯å­—ç¬¦ä¸²
             
-    # È¥³ı×îºóµÄ¶ººÅ
+    # å»é™¤æœ€åçš„é€—å·
     if len(sql_part1) > 1:
         sql_part1 = sql_part1[:-1]
         sql_part2 = sql_part2[:-1]
-    # µÃµ½×îºóµÄsqlÓï¾ä
+    # å¾—åˆ°æœ€åçš„sqlè¯­å¥
     sql = sql % (sql_part1,sql_part2)
     
-    # ·µ»ØsqlºÍ²ÎÊı
+    # è¿”å›sqlå’Œå‚æ•°
     return sql
 
 def get_insert_sql_and_paras(table_name, obj, filter=[]):
-    '''»ñÈ¡Ö¸¶¨¶ÔÏóµÄsql²åÈëÓï¾äºÍ²ÎÊı'''
+    '''è·å–æŒ‡å®šå¯¹è±¡çš„sqlæ’å…¥è¯­å¥å’Œå‚æ•°'''
     sql = "insert into " + table_name + "(%s) values (%s)"
     sql_part1 = ""
     sql_part2 = ""
     paras = []
     for (k,v) in obj.__dict__.items():
-        if k in filter: # ÅĞ¶ÏÊÇ·ñÊÇ¹ıÂËµÄ×Ö¶Î
+        if k in filter: # åˆ¤æ–­æ˜¯å¦æ˜¯è¿‡æ»¤çš„å­—æ®µ
             continue
         sql_part1 += k + ","
         
         # The format string is not really a normal Python format string. You must always use %s for all fields.
-        # Õâ¸öÎÊÌâÀ§ÈÅÁËºÃ¾Ã£¬Ô­À´Õâ¸ö×ª»»ºÍPythonµÄ×ª»»²»Ò»Ñù£¬ËùÓĞ¶¼ÒªÓÃ%s£¬²»ÓÃ%d
+        # è¿™ä¸ªé—®é¢˜å›°æ‰°äº†å¥½ä¹…ï¼ŒåŸæ¥è¿™ä¸ªè½¬æ¢å’ŒPythonçš„è½¬æ¢ä¸ä¸€æ ·ï¼Œæ‰€æœ‰éƒ½è¦ç”¨%sï¼Œä¸ç”¨%d
         if type(v) is int:
-            sql_part2 += "%s," # Èç¹ûÊÇintÔòÊ¹ÓÃ %d
+            sql_part2 += "%s," # å¦‚æœæ˜¯intåˆ™ä½¿ç”¨ %d
             paras.append(v)
         else:
-            sql_part2 += "%s," # ·ñÔò¶¼µ±³ÉÊÇ×Ö·û´®
+            sql_part2 += "%s," # å¦åˆ™éƒ½å½“æˆæ˜¯å­—ç¬¦ä¸²
             paras.append(get_code_str(v))
             
-    # È¥³ı×îºóµÄ¶ººÅ
+    # å»é™¤æœ€åçš„é€—å·
     if len(sql_part1) > 1:
         sql_part1 = sql_part1[:-1]
         sql_part2 = sql_part2[:-1]
-    # µÃµ½×îºóµÄsqlÓï¾ä
+    # å¾—åˆ°æœ€åçš„sqlè¯­å¥
     sql = sql % (sql_part1,sql_part2)
     
-    # ·µ»ØsqlºÍ²ÎÊı
+    # è¿”å›sqlå’Œå‚æ•°
     return (sql, paras)
 
 def get_code_str(s, ts="gbk", cs="utf-8"):
-    '''»ñÈ¡Ö¸¶¨±àÂë'''
-    return str(s).decode(ts).encode(cs)
+    '''è·å–æŒ‡å®šç¼–ç '''
+    return str(s) #str(s).decode(ts).encode(cs)
 

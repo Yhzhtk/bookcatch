@@ -1,7 +1,7 @@
-# coding=gbk
+# coding=utf-8
 '''
 Created on 2013-7-25
-Ò»¼üÍê³ÉÁ÷³Ì
+ä¸€é”®å®Œæˆæµç¨‹
 @author: gudh
 '''
 
@@ -17,7 +17,7 @@ if __name__ == '__main__':
             book = bookcrawl.crawl_insert_books(book_id)
             if book != None:
                 print "begin shot book: %s" % book_id
-                d_t = book.bookSize / 50 # ¸ù¾İÎÄ¼ş´óĞ¡¼ÆËãÏÂÔØÊ±¼ä£¬Ã¿Ãë50k
+                d_t = book.bookSize / 50 # æ ¹æ®æ–‡ä»¶å¤§å°è®¡ç®—ä¸‹è½½æ—¶é—´ï¼Œæ¯ç§’50k
                 bookshot.shot_first_book(book.nid, down_time=d_t)
             else:
                 print "crawl_insert_books book fail: %s %s %s" % (book_id, "", "") 

@@ -1,45 +1,45 @@
-# coding=gbk
+# coding=utf-8
 '''
 Created on 2013-7-26
-ËùÓĞÅäÖÃ
+æ‰€æœ‰é…ç½®
 @author: gudh
 '''
 
 import yaml,os
 
-# Ä¬ÈÏÇëÇóÍ·
+# é»˜è®¤è¯·æ±‚å¤´
 default_header = {'User-Agent' : 'Mozilla/5.0 (Windows NT 5.2) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.84 Safari/537.22' }
 
-# Êı¾İ¿âÁ¬½Ó²ÎÊı
+# æ•°æ®åº“è¿æ¥å‚æ•°
 host=""
 port=3306
 user="root"
 passwd="314"
 charset="utf8"
-# ÏêÏ¸Êı¾İ¿âĞÅÏ¢
+# è¯¦ç»†æ•°æ®åº“ä¿¡æ¯
 db_name = "ebook"
 book_table_name = "shotbook"
 chapter_table_name = "chapter"
 
-# ¿Í»§¶Ë²ÎÊı
-col_num = 5 # Ä¬ÈÏÑ¡Í¼ÁĞÊı
-page_count = 10 # Ã¿Ò³Í¼Æ¬Êı
-img_width = 200 # Ä¬ÈÏÍ¼Ïñ¿í¶È
-img_height = 333 # Ä¬ÈÏÍ¼Ïñ¸ß¶È
+# å®¢æˆ·ç«¯å‚æ•°
+col_num = 5 # é»˜è®¤é€‰å›¾åˆ—æ•°
+page_count = 10 # æ¯é¡µå›¾ç‰‡æ•°
+img_width = 200 # é»˜è®¤å›¾åƒå®½åº¦
+img_height = 333 # é»˜è®¤å›¾åƒé«˜åº¦
 
-# ÎÄ¼şÏÂÔØ¸ùÂ·¾¶
+# æ–‡ä»¶ä¸‹è½½æ ¹è·¯å¾„
 rootpath = "F:/ebook/"
 
-# ËùÓĞ×ø±êĞÅÏ¢
-fhsj_pos_sleep = (109, 74, 1) # ·µ»ØÊé¼ÜÎ»ÖÃ
-wdcd_pos_sleep = (118, 202, 1) # ÎÒµÄ³©¶ÁÎ»ÖÃ
-sx_pos_sleep = (339, 79, 1) # Ë¢ĞÂ
-zxcd_first_pos_sleep = (492, 171, 1) # ÔÚÏß³©¶ÁµÚÒ»±¾ÊıµÄÎ»ÖÃ
-dect = (158, 175, 607, 928) # ½ØÍ¼ÇøÓò
-next_pos_sleep = (666, 568, 0.2) # ÏÂÒ»Ò³Î»ÖÃ£¬ÑÓÊ±
+# æ‰€æœ‰åæ ‡ä¿¡æ¯
+fhsj_pos_sleep = (109, 74, 1) # è¿”å›ä¹¦æ¶ä½ç½®
+wdcd_pos_sleep = (118, 202, 1) # æˆ‘çš„ç•…è¯»ä½ç½®
+sx_pos_sleep = (339, 79, 1) # åˆ·æ–°
+zxcd_first_pos_sleep = (492, 171, 1) # åœ¨çº¿ç•…è¯»ç¬¬ä¸€æœ¬æ•°çš„ä½ç½®
+dect = (158, 175, 607, 928) # æˆªå›¾åŒºåŸŸ
+next_pos_sleep = (666, 568, 0.2) # ä¸‹ä¸€é¡µä½ç½®ï¼Œå»¶æ—¶
 
 def load_yaml(yaml_file):
-    '''¼ÓÔØyamlÅäÖÃ²ÎÊı'''
+    '''åŠ è½½yamlé…ç½®å‚æ•°'''
     stream = file(yaml_file, 'r')
     config = yaml.load(stream)
     
@@ -47,7 +47,7 @@ def load_yaml(yaml_file):
         if field in config:
             globals()[field] = config[field]
 
-# ¼ÓÔØÅäÖÃÎÄ¼ş
+# åŠ è½½é…ç½®æ–‡ä»¶
 yaml_file = r'config.yaml'
 if not os.path.exists(yaml_file):
     yaml_file = "../" + yaml_file

@@ -1,14 +1,14 @@
-# coding=gbk
+# coding=utf-8
 '''
 Created on 2013-7-24
-Êı¾İ¿â·ÃÎÊDemo
+æ•°æ®åº“è®¿é—®Demo
 @author: gudh
 '''
 
 import MySQLdb
 
 def create_insert():
-    '''´´½¨²¢²åÈëÊı¾İ¿â'''
+    '''åˆ›å»ºå¹¶æ’å…¥æ•°æ®åº“'''
     try:
         conn=MySQLdb.Connect(host='localhost',user='root',passwd='314',port=3306)
         cur=conn.cursor()
@@ -25,7 +25,7 @@ def create_insert():
             values.append((i,'hi rollen'+str(i)))
         
         cur.executemany('insert into test values(%s,%s)',values)
-        cur.execute('update test set info="I am rollenAºÃ°®µÄ·¢Éù" where id=3')
+        cur.execute('update test set info="I am rollenAå¥½çˆ±çš„å‘å£°" where id=3')
     
         conn.commit()
         cur.close()
@@ -35,12 +35,12 @@ def create_insert():
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
 
 def select():
-    '''²éÑ¯Êı¾İ¿â'''
+    '''æŸ¥è¯¢æ•°æ®åº“'''
     try:
         conn=MySQLdb.Connect(host='localhost',user='root',passwd='314',port=3306,charset='utf8')
         cur=conn.cursor()
         conn.select_db('python')
-        cur.execute('update test set info="' + 'È¥'.encode("utf8") + '" where id=3')
+        cur.execute('update test set info="' + 'å»'.encode("utf8") + '" where id=3')
         count=cur.execute('select * from test')
         print 'there has %s rows record' % count
 

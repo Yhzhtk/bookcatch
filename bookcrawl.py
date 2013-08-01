@@ -1,7 +1,7 @@
-# coding=gbk
+# coding=utf-8
 '''
 Created on 2013-7-23
-×¥È¡Êé
+æŠ“å–ä¹¦
 @author: gudh
 '''
 import re,os,time,traceback
@@ -11,14 +11,15 @@ from bookmode import Shotbook,Chapter
 import bookorm
 
 def get_url_content(url, headers={}):
-    '''ÒÔÖ¸¶¨UA»ñÈ¡ÍøÒ³ÄÚÈİ'''
+    '''ä»¥æŒ‡å®šUAè·å–ç½‘é¡µå†…å®¹'''
     headers.update(bookconfig.default_header)
     req = urllib2.Request(url, None, headers)
     html = urllib2.urlopen(req).read()
+    html = get_code_str(html)
     return html
 
 def down_file(url, path, headers={}, style=2):
-    '''ÏÂÔØÎÄ¼ş'''
+    '''ä¸‹è½½æ–‡ä»¶'''
     if style == 1:
         urllib.urlretrieve(url, path)
     elif style == 2:
@@ -30,41 +31,45 @@ def down_file(url, path, headers={}, style=2):
         raise Exception,"no this style"
 
 def regex_one(regex, content, group=1):
-    '''ÕıÔò²éÕÒµÚÒ»¸öÆ¥Åä·µ»ØÖ¸¶¨·Ö×é'''
+    '''æ­£åˆ™æŸ¥æ‰¾ç¬¬ä¸€ä¸ªåŒ¹é…è¿”å›æŒ‡å®šåˆ†ç»„'''
     pattern = re.compile(regex, re.DOTALL)
     match = pattern.search(content)
     return match.group(group)
 
 def regex_all(regex, content, group=1):
-    '''ÕıÔò²éÕÒËùÓĞÆ¥Åä·µ»ØÖ¸¶¨·Ö×é'''
+    '''æ­£åˆ™æŸ¥æ‰¾æ‰€æœ‰åŒ¹é…è¿”å›æŒ‡å®šåˆ†ç»„'''
     pattern = re.compile(regex, re.DOTALL)
     matchs = pattern.finditer(content)
     return [match.group(group) for match in matchs if match]
 
+def get_code_str(s, ts="gbk", cs="utf-8"):
+    '''è·å–æŒ‡å®šç¼–ç '''
+    return str(s).decode(ts).encode(cs)
+
 def add_book_to_lebook(bookId):
-    '''½«ÊéÌí¼Óµ½¿Í»§¶Ë£¬ÊÂÏÈĞèÒªÉèÖÃºÃjdµÄcookie'''
+    '''å°†ä¹¦æ·»åŠ åˆ°å®¢æˆ·ç«¯ï¼Œäº‹å…ˆéœ€è¦è®¾ç½®å¥½jdçš„cookie'''
     url = jd.get_addbook_url(bookId)
-    return '"message":"³É¹¦"' in get_url_content(url, {"Cookie" : jd.cookie})
+    return '"message":"æˆåŠŸ"' in get_url_content(url, {"Cookie" : jd.cookie})
 
 def crawl_book(bookId):
-    '''×¥È¡²¢½âÎöÊéµÄĞÅÏ¢'''
+    '''æŠ“å–å¹¶è§£æä¹¦çš„ä¿¡æ¯'''
     book = Shotbook(bookId)
     url = jd.get_book_url(bookId)
     content = get_url_content(url)
     
     book.bookName = regex_one(jd.namereg, content)
     book.author = regex_one(jd.authorreg, content)
-    book.set_id_coverpath() # ÓÉÊéÃûºÍ×÷ÕßÃûÉú³ÉnidºÍ·âÃæÂ·¾¶
+    book.set_id_coverpath() # ç”±ä¹¦åå’Œä½œè€…åç”Ÿæˆnidå’Œå°é¢è·¯å¾„
     catearea = regex_one(jd.cateareareg, content)
     catelist = regex_all(jd.catereg, catearea)
-    book.type = catelist[len(catelist) - 1].replace("/", "").replace("¡¢", "")
+    book.type = catelist[len(catelist) - 1].replace("/", "").replace("ã€", "")
     book.coverurl = regex_one(jd.coverimgreg, content)
     book.bookSize = int(float(regex_one(jd.sizereg, content)) * 1000)
-    desc = regex_one(jd.descreg, content).replace("<br />"," ").replace("¡¡","").replace(" ", "").strip()
+    desc = regex_one(jd.descreg, content).replace("<br />"," ").replace("ã€€","").replace(" ", "").strip()
     desc = re.sub("<.*?>", "", desc)
     book.description = desc
     chapterarea = regex_one(jd.chaptersreg, content)
-    # ´¦ÀíÕÂ½ÚÖĞµÄ¼âÀ¨ºÅ
+    # å¤„ç†ç« èŠ‚ä¸­çš„å°–æ‹¬å·
     nchapters = []
     for cc in re.split("<br ?/?>", chapterarea):
         if not cc:
@@ -75,12 +80,12 @@ def crawl_book(bookId):
                 print c
                 nchapters.append(c)
     book.chapters = [Chapter(book.nid, str(i), line, book.bookName, book.author, 0) for (i,line) in enumerate(nchapters, 1)]
-    # ÍêÉÆÕÂ½ÚĞÅÏ¢
+    # å®Œå–„ç« èŠ‚ä¿¡æ¯
     book.complete_chapter()
     
-    # ÏÂÔØ·âÃæ
+    # ä¸‹è½½å°é¢
     cover_path = bookconfig.rootpath + time.strftime("%Y%m%d") + "/cover/" + book.coverImgPath
-    # Èç¹ûÂ·¾¶²»´æÔÚ£¬ÔòÏÈ´´½¨Â·¾¶
+    # å¦‚æœè·¯å¾„ä¸å­˜åœ¨ï¼Œåˆ™å…ˆåˆ›å»ºè·¯å¾„
     if not os.path.exists(os.path.split(cover_path)[0]):
         os.makedirs(os.path.split(cover_path)[0])
     print "begin down cover: %s" % cover_path
@@ -89,13 +94,13 @@ def crawl_book(bookId):
     return book
 
 def insert_book(book):
-    '''bookÊı¾İ²åÈëÊı¾İ¿â'''
+    '''bookæ•°æ®æ’å…¥æ•°æ®åº“'''
     print "crawl complete, insert db"
     bookorm.insert_book(book)
     bookorm.insert_chapter(book.chapters)
 
 def crawl_insert_books(book_id):
-    '''×¥È¡Ö¸¶¨IDµÄĞÅÏ¢²¢²åÈëÊı¾İ¿â£¬·µ»ØÊéµÄÁĞ±í'''
+    '''æŠ“å–æŒ‡å®šIDçš„ä¿¡æ¯å¹¶æ’å…¥æ•°æ®åº“ï¼Œè¿”å›ä¹¦çš„åˆ—è¡¨'''
     print "-"*10 + "\r\ncrawl id: %s" % book_id
     book = None
     try:

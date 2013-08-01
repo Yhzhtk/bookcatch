@@ -1,49 +1,49 @@
-# coding=gbk
+# coding=utf-8
 '''
 Created on 2013-7-24
-ÊµÌåÀà
+å®ä½“ç±»
 @author: gudh
 '''
 import md5
 import time
 
 def getmd5(string):
-    '''»ñÈ¡×Ö·û´®µÄMD5'''
+    '''è·å–å­—ç¬¦ä¸²çš„MD5'''
     m = md5.new(string)
     m.digest()
     return m.hexdigest()
 
 class Shotbook():
-    '''ÊéÀà'''
+    '''ä¹¦ç±»'''
     
     db_field_seq=("nid","jdid","bookName","author","coverImgPath","description","type","chapterList","chapterCount","imgCount","state","createTime","updateTime","chapterok","isok")
     
     def __init__(self, jdid=""):
-        # Êı¾İ¿â×Ö¶Î
-        self.nid = "" #'Ğ¡Ëµid',
-        self.jdid = jdid #¾©¶«µÄID
-        self.bookName = "" # 'Ğ¡ËµÃû³Æ',
-        self.author = "" # 'Ğ¡Ëµ×÷Õß',
-        self.coverImgPath = "" #'Ğ¡Ëµ·âÃæÍ¼Æ¬µØÖ·',
-        self.description = "" #'Ğ¡Ëµ¼ò½é',
-        self.type = "" # 'Ğ¡ËµÀàĞÍ',
-        self.chapterList = "" # 'ÕÂ½ÚÁĞ±í',
-        self.chapterCount = 0 # 'ÕÂ½Ú×ÜÊı',
-        self.imgCount = 0 #Í¼Æ¬ÊıÁ¿
-        self.state = 1 # 'Ğ¡Ëµ×´Ì¬ 0£¬ÎªÁ¬ÔØ£¬1ÎªÍê½á'£¬Ä¬ÈÏÍê½á
-        self.createTime = time.strftime("%Y-%m-%d %H:%M:%S") # ´´½¨Ê±¼ä
-        self.updateTime = time.strftime("%Y-%m-%d %H:%M:%S") # '¸üĞÂÊ±¼ä'
-        self.chapterok = 0 # ·ÖÕÂÊÇ·ñÍê³É£¬0Ã»ÓĞ£¬1Íê³É
-        self.isok = 0 #'ÊÇ·ñ½¨µ½Ë÷ÒıÖĞÈ¥£¬0ÎªÃ»ÓĞ£¬1ÎªÒÑ¾­½¨ÁË',
-        #·ÇÊı¾İ¿â×Ö¶Î
-        self.coverurl = "" #·âÃæÍ¼Æ¬Url
-        self.chapters = [] #ÕÂ½ÚÁĞ±í£¬°üÀ¨ÕÂ½ÚÃû³ÆºÍÊıÁ¿
+        # æ•°æ®åº“å­—æ®µ
+        self.nid = "" #'å°è¯´id',
+        self.jdid = jdid #äº¬ä¸œçš„ID
+        self.bookName = "" # 'å°è¯´åç§°',
+        self.author = "" # 'å°è¯´ä½œè€…',
+        self.coverImgPath = "" #'å°è¯´å°é¢å›¾ç‰‡åœ°å€',
+        self.description = "" #'å°è¯´ç®€ä»‹',
+        self.type = "" # 'å°è¯´ç±»å‹',
+        self.chapterList = "" # 'ç« èŠ‚åˆ—è¡¨',
+        self.chapterCount = 0 # 'ç« èŠ‚æ€»æ•°',
+        self.imgCount = 0 #å›¾ç‰‡æ•°é‡
+        self.state = 1 # 'å°è¯´çŠ¶æ€ 0ï¼Œä¸ºè¿è½½ï¼Œ1ä¸ºå®Œç»“'ï¼Œé»˜è®¤å®Œç»“
+        self.createTime = time.strftime("%Y-%m-%d %H:%M:%S") # åˆ›å»ºæ—¶é—´
+        self.updateTime = time.strftime("%Y-%m-%d %H:%M:%S") # 'æ›´æ–°æ—¶é—´'
+        self.chapterok = 0 # åˆ†ç« æ˜¯å¦å®Œæˆï¼Œ0æ²¡æœ‰ï¼Œ1å®Œæˆ
+        self.isok = 0 #'æ˜¯å¦å»ºåˆ°ç´¢å¼•ä¸­å»ï¼Œ0ä¸ºæ²¡æœ‰ï¼Œ1ä¸ºå·²ç»å»ºäº†',
+        #éæ•°æ®åº“å­—æ®µ
+        self.coverurl = "" #å°é¢å›¾ç‰‡Url
+        self.chapters = [] #ç« èŠ‚åˆ—è¡¨ï¼ŒåŒ…æ‹¬ç« èŠ‚åç§°å’Œæ•°é‡
         self.bookSize = 500
-        #ĞèÒª¹ıÂËµÄ×Ö¶Î
+        #éœ€è¦è¿‡æ»¤çš„å­—æ®µ
         self.filter = ["coverurl", "chapters", "bookSize", "filter"]
         
     def set_id_coverpath(self):
-        '''¸ù¾İÊéÃûºÍ×÷ÕßÉèÖÃÊéµÄID'''
+        '''æ ¹æ®ä¹¦åå’Œä½œè€…è®¾ç½®ä¹¦çš„ID'''
         key = self.bookName + "#" + self.author
         md5 = getmd5(key)
         self.nid = md5
@@ -51,16 +51,16 @@ class Shotbook():
         self.coverImgPath = coverpath
     
     def complete_chapter(self):
-        '''ÍêÉÆÕÂ½ÚĞÅÏ¢'''
+        '''å®Œå–„ç« èŠ‚ä¿¡æ¯'''
         self.chapterList = '$-$'.join([c.cid + "#-#" + c.cTitle for c in self.chapters])
         self.chapterCount = len(self.chapters)
     
     def upTime(self):
-        '''¸üĞÂÊ±¼ä'''
-        self.updateTime = time.strftime("%Y-%m-%d %H:%M:%S") # '¸üĞÂÊ±¼ä',
+        '''æ›´æ–°æ—¶é—´'''
+        self.updateTime = time.strftime("%Y-%m-%d %H:%M:%S") # 'æ›´æ–°æ—¶é—´',
     
     def str(self):
-        '''´òÓ¡µ±Ç°ÀàµÄĞÅÏ¢'''
+        '''æ‰“å°å½“å‰ç±»çš„ä¿¡æ¯'''
         for (a, b) in self.__dict__.items():
             if isinstance(b, list):
                 print "-"*10
@@ -74,7 +74,7 @@ class Shotbook():
                 print ":".join((a,str(b)))
 
 class Chapter():
-    '''ÕÂ½ÚÀà'''
+    '''ç« èŠ‚ç±»'''
     db_field_seq=("nid","cid","cTitle","bookName","author","imgCount")
     
     def __init__(self, nid = "", cid = "", cTitle = "", bookName = "", author="", imgCount = 0):
@@ -84,11 +84,11 @@ class Chapter():
         self.bookName = bookName
         self.author = author
         self.imgCount = imgCount
-        #ĞèÒª¹ıÂËµÄ×Ö¶Î
+        #éœ€è¦è¿‡æ»¤çš„å­—æ®µ
         self.filter = ["filter"]
 
     def str(self):
-        '''´òÓ¡µ±Ç°ÀàµÄĞÅÏ¢'''
+        '''æ‰“å°å½“å‰ç±»çš„ä¿¡æ¯'''
         for (a, b) in self.__dict__.items():
             print ":".join((a,str(b)))
 
