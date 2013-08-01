@@ -5,10 +5,10 @@ Created on 2013-7-23
 @author: gudh
 '''
 import re,os,time,traceback
-import urllib,urllib2   
+import urllib,urllib2,Image
 import jd,bookconfig
 from bookmode import Shotbook,Chapter
-import bookorm
+import bookorm,bookshot
 
 def get_url_content(url, headers={}):
     '''以指定UA获取网页内容'''
@@ -51,6 +51,14 @@ def add_book_to_lebook(bookId):
     url = jd.get_addbook_url(bookId)
     return '"message":"成功"' in get_url_content(url, {"Cookie" : jd.cookie})
 
+def del_cover(path):
+    '''默认封面处理'''
+    im = Image.open(path)
+    if im.size[0] > 275 and im.size[0] < 285 and im.size[1] > 275 and im.size[1] < 285:
+        dect = (40, 0, 240, 280)
+        im = im.crop(dect)
+        bookshot.save(im, path)
+
 def crawl_book(bookId):
     '''抓取并解析书的信息'''
     book = Shotbook(bookId)
@@ -90,6 +98,8 @@ def crawl_book(bookId):
         os.makedirs(os.path.split(cover_path)[0])
     print "begin down cover: %s" % cover_path
     down_file(book.coverurl, cover_path)
+    # 安装默认方法处理封面图片
+    del_cover(cover_path)
     
     return book
 
@@ -109,7 +119,7 @@ def crawl_insert_books(book_id):
         else:
             print "begin crawl: %s" % book_id
             book = crawl_book(book_id)
-            print "begin insert: %s %s %s" % (book_id, book.nid, book.bookName) 
+            print "begin insert: %s %s %s" % (book.bookName, book.nid, book_id) 
             insert_book(book)
     except Exception:
         exstr = traceback.format_exc()

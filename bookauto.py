@@ -7,8 +7,14 @@ Created on 2013-7-25
 
 import bookcrawl,bookshot
 
+def get_book_ids(url="http://e.jd.com/ebook.html"):
+    content = bookcrawl.get_url_content(url)
+    ids = bookcrawl.regex_all('''href="http://e.jd.com/(\d{5,10}).html"''', content, 1)
+    print ids
+    return ids
+
 if __name__ == '__main__':
-    book_ids = ["30057405","30069437"]
+    book_ids = get_book_ids()
     for book_id in book_ids:
         print "=" * 50
         print "BEGIN BOOK_ID : %s" % book_id

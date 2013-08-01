@@ -15,7 +15,7 @@ chapter_table_name: chapter
 
 # 客户端参数
 col_num: 5 # 默认选图列数
-page_count: 10 # 每页图片数
+page_count: 100 # 每页图片数
 img_width: 200 # 默认图像宽度
 img_height: 333 # 默认图像高度
 
@@ -24,8 +24,10 @@ rootpath: F:/ebook/
 
 # 所有坐标信息
 fhsj_pos_sleep: [109, 74, 1] # 返回书架位置
-wdcd_pos_sleep: [118, 202, 1] # 我的畅读位置
-sx_pos_sleep: [339, 79, 1] # 刷新
+wdcd_pos_sleep: [112, 205, 1] # 我的畅读位置
+sx_pos_sleep: [345, 71, 1] # 刷新
 zxcd_first_pos_sleep: [492, 171, 1] # 在线畅读第一本数的位置
-dect: [158, 175, 607, 928] # 截图区域
+start_pos: [145, 153] # 截图左上角坐标
+shot_size: [480, 800] # 截图大小
+inner_blank_sleep: [354, 467, 0.2] # 书内空白位置
 next_pos_sleep: [666, 568, 0.2] # 下一页位置，延时

@@ -333,5 +333,5 @@ def get_insert_sql_and_paras(table_name, obj, filter=[]):
 
 def get_code_str(s, ts="gbk", cs="utf-8"):
     '''获取指定编码'''
-    return str(s) #str(s).decode(ts).encode(cs)
+    return s #str(s).decode(ts).encode(cs)
 

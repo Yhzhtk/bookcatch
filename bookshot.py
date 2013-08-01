@@ -24,14 +24,14 @@ def click(left=True):
         d = win32con.MOUSEEVENTF_RIGHTDOWN
         u = win32con.MOUSEEVENTF_RIGHTUP
     win32api.mouse_event(d, 0, 0) 
-    time.sleep(0.01)
+    time.sleep(0.1)
     win32api.mouse_event(u, 0, 0)
-    time.sleep(0.01)
+    time.sleep(0.1)
 
 def double_click():
     '''双击鼠标'''
     click()
-    time.sleep(0.05)
+    time.sleep(0.1)
     click()
 
 def move_click_sleep(pos_sleep):
@@ -119,12 +119,14 @@ def is_equal(img1, img2, jump=1):
     print "isequal true"
     return True
 
-def shot_book(img_dect, next_pos_sleep, nid, cid):
+def shot_book(img_dect, inner_blank_sleep, next_pos_sleep, nid, cid):
     '''拍书'''
     flag = 0
     path = bookconfig.rootpath + time.strftime("%Y%m%d") + "/content/%s/" + nid[0:2] + "/" + nid[2:4] + "/" + nid[4:] + "/%s/%s.jpg"
     last_img = None
     i = 0
+    # 点击空白位
+    move_click_sleep(inner_blank_sleep)
     while True:
         i += 1
         img = cut(img_dect)
@@ -155,8 +157,7 @@ def shot_book(img_dect, next_pos_sleep, nid, cid):
     book = bookorm.get_book(nid)
     book.imgCount = i
     book.upTime()
-    bookorm.delete_book(book.nid)
-    bookorm.insert_book(book)
+    bookorm.save_book(book)
 
 def pos_to_first_book(down_time=10):
     '''从上一本书的结尾定位到第一本畅读的阅读页'''
@@ -169,11 +170,15 @@ def pos_to_first_book(down_time=10):
     print "begin down book sleep: %d" % down_time
     time.sleep(down_time) # 下载时间
     move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
+    move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
 
 def shot_first_book(nid, cid="1", down_time=10):
     '''拍最前面一本书'''
     pos_to_first_book(down_time)
-    shot_book(bookconfig.dect, bookconfig.next_pos_sleep, nid, cid)
+    start_pos = bookconfig.start_pos
+    shot_size = bookconfig.shot_size
+    dect = (start_pos[0], start_pos[1], start_pos[0] + shot_size[0], start_pos[1] + shot_size[1])
+    shot_book(dect, bookconfig.inner_blank_sleep, bookconfig.next_pos_sleep, nid, cid)
 
 if __name__ == '__main__':
     time.sleep(2)

@@ -35,7 +35,9 @@ fhsj_pos_sleep = (109, 74, 1) # 返回书架位置
 wdcd_pos_sleep = (118, 202, 1) # 我的畅读位置
 sx_pos_sleep = (339, 79, 1) # 刷新
 zxcd_first_pos_sleep = (492, 171, 1) # 在线畅读第一本数的位置
-dect = (158, 175, 607, 928) # 截图区域
+start_pos = (158, 175) # 截图左上角坐标
+shot_size = (480, 800) # 截图大小
+inner_blank_sleep = [354, 467, 0.2] # 书内空白位置
 next_pos_sleep = (666, 568, 0.2) # 下一页位置，延时
 
 def load_yaml(yaml_file):
