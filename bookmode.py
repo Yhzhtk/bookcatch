@@ -52,7 +52,7 @@ class Shotbook():
     
     def complete_chapter(self):
         '''完善章节信息'''
-        self.chapterList = '$-$'.join([c.cid + "#-#" + c.cTitle for c in self.chapters])
+        self.chapterList = '$-$'.join([str(c.cid) + "#-#" + c.cTitle for c in self.chapters])
         self.chapterCount = len(self.chapters)
     
     def upTime(self):

@@ -99,7 +99,7 @@ def delete_chapter(nid):
     return False
 
 def save_book(book):
-    '''先删除，再插入，失败则回滚'''
+    '''先删除，再插入书籍'''
     try:
         conn = get_conn()
         cur = conn.cursor()
@@ -113,6 +113,35 @@ def save_book(book):
         sp = get_insert_sql_and_paras(bookconfig.book_table_name, book, book.filter)
         print sp[0]
         cur.execute(sp[0],sp[1])
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return True
+    except MySQLdb.Error,e:
+        print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+    return False
+
+def save_chapters(nid, chapters):
+    '''先删除，再插入章节'''
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        conn.select_db(bookconfig.db_name)
+       
+        sql = "delete from %s where nid = '%s'" % (bookconfig.chapter_table_name, nid)
+        print sql
+        cur.execute(sql)
+        
+        # 获取插入语句
+        sql = get_insert_sql(bookconfig.chapter_table_name, chapters[0], chapters[0].filter)
+        print sql
+        
+        for chapter in chapters:
+            # 循环插入数据
+            paras = get_insert_paras(chapter, chapter.filter)
+            cur.execute(sql, paras)
         
         conn.commit()
         cur.close()
