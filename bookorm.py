@@ -50,8 +50,41 @@ def insert_chapter(chapters):
         cur.close()
         conn.close()
         
+        return True
     except MySQLdb.Error,e:
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+        return False
+
+def insert_book_chapter(book):
+    '''插入一本书包括章节的信息到数据库'''
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        # 获取插入参数
+        sp = get_insert_sql_and_paras(bookconfig.book_table_name, book, book.filter)
+        
+        conn.select_db(bookconfig.db_name)
+        print sp[0]
+        cur.execute(sp[0],sp[1])
+        
+        chapters = book.chapters
+        # 获取插入语句
+        sql = get_insert_sql(bookconfig.chapter_table_name, chapters[0], chapters[0].filter)
+        print sql
+        
+        for chapter in chapters:
+            # 循环插入数据
+            paras = get_insert_paras(chapter, chapter.filter)
+            cur.execute(sql, paras)
+
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return True
+    except MySQLdb.Error,e:
+        print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+        return False
 
 def delete_book(nid, del_chap=False):
     '''删除书'''

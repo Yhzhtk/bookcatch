@@ -154,13 +154,13 @@ class BookMain(QMainWindow, Ui_MainWindow):
         
         # 获取书的基本路径
         date = book.createTime[0:10].replace("-", "")
-        book_path = day_path % date + "content/low/" + book.nid[0:2] + "/" + book.nid[2:4] + "/" + book.nid[4:] + "/1/%s.jpg"
+        book_path = day_path % date + "content/l/" + book.nid[0:2] + "/" + book.nid[2:4] + "/" + book.nid[4:] + "/1/%s.jpg"
         
         # 进度条最大值
         self.progressBar.setMaximum(imgCount)
         
         for i in range(start + 1, end + 1):
-            self.progressBar.setValue(i)
+            self.progressBar.setValue(i - start)
             
             # split 表示是否识别为大图
             split = False
