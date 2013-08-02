@@ -31,3 +31,4 @@ start_pos: [145, 153] # 截图左上角坐标
 shot_size: [480, 800] # 截图大小
 inner_blank_sleep: [354, 467, 0.2] # 书内空白位置
 next_pos_sleep: [666, 568, 0.2] # 下一页位置，延时
+blod_para = (3, 3, 65) # 识别粗体的参数

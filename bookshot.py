@@ -75,10 +75,11 @@ def print_rgb(img):
         for y in range(size[1]):
             print x,y,img.getpixel((x, y))
 
-def is_bold(img, w, h, p):
+def is_bold(img, blod_para):
     '''是否是粗体'''
     size = img.size
     arr = []
+    (w, h, p) = blod_para
     for y in range(size[1]):
         arx = []
         for x in range(size[0]):
@@ -142,10 +143,10 @@ def shot_book(img_dect, inner_blank_sleep, next_pos_sleep, nid, cid):
         else:
             flag = 0
         s_i = str(i)
-        if is_bold(img, 3, 3, 65):
+        if is_bold(img, bookconfig.blod_para):
             s_i = s_i + "_b"
-        hpath = path % ("high", cid, s_i)
-        lpath = path % ("low", cid, s_i)
+        hpath = path % ("h", cid, s_i)
+        lpath = path % ("l", cid, s_i)
         save(img, hpath)
         save(img, lpath, 30)
         print "save ok: " + hpath

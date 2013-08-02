@@ -37,8 +37,9 @@ sx_pos_sleep = (339, 79, 1) # 刷新
 zxcd_first_pos_sleep = (492, 171, 1) # 在线畅读第一本数的位置
 start_pos = (158, 175) # 截图左上角坐标
 shot_size = (480, 800) # 截图大小
-inner_blank_sleep = [354, 467, 0.2] # 书内空白位置
+inner_blank_sleep = (354, 467, 0.2) # 书内空白位置
 next_pos_sleep = (666, 568, 0.2) # 下一页位置，延时
+blod_para = (3, 3, 65) # 识别粗体的参数
 
 def load_yaml(yaml_file):
     '''加载yaml配置参数'''

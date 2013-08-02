@@ -81,33 +81,54 @@ class BookMain(QMainWindow, Ui_MainWindow):
         self.descriptionEdit.setText(book.description)
         self.createTimeEdit.setText(book.createTime)
         self.createTimeEdit.setEnabled(False)
-        
+    
+    def __refresh_chap_count(self, update_index):
+        '''更新章节数量'''
+        now_chap_count = self.completeListWidget.count()
+        if update_index >= now_chap_count or update_index < 0:
+            return
+        last_index = 0
+        if update_index > 0:
+            last_index = int(self.completeListWidget.item(update_index - 1).text().split(self.decode("。"))[1])
+        infos = self.completeListWidget.item(update_index).text().split(self.decode("。"))
+        index = int(infos[1])
+        chap_name = infos[3]
+        self.completeListWidget.item(update_index).setText(str(update_index)  + self.decode("。") + str(index) + self.decode("。(") + str(index - last_index) + self.decode(")。")+ chap_name)
+    
     def __add_split_info(self, index, chap_name):
         '''添加一条分章信息'''
         now_chap_count = self.completeListWidget.count()
         loc = 0
+        last_index = 0
+        is_add = False
         if now_chap_count > 0:
             for i in range(now_chap_count):
-                i_index = int(self.completeListWidget.item(i).text().split("#\t")[0])
+                i_index = int(self.completeListWidget.item(i).text().split(self.decode("。"))[1])
                 if index < i_index:
                     loc = i
+                    is_add = True
                     break
                 elif index == i_index:
                     self.completeListWidget.takeItem(i)
                     loc = i
+                    is_add = False
                     break
+                last_index = i_index
             else:
                 loc = now_chap_count
         self.split_chap_infos[str(index)] = chap_name
-        self.completeListWidget.insertItem(loc, QListWidgetItem(str(index) + "#\t" + chap_name))
-            
+        self.completeListWidget.insertItem(loc, QListWidgetItem(str(loc)  + self.decode("。") + str(index) + self.decode("。(") + str(index - last_index) + self.decode(")。")+ chap_name))
+        if is_add:
+            self.__refresh_chap_count(loc + 1)
+        
     def __del_split_info(self, index):
         '''删除分章信息'''
         for i in range(self.completeListWidget.count()):
-            i_index = int(self.completeListWidget.item(i).text().split("#\t")[0])
+            i_index = int(self.completeListWidget.item(i).text().split(self.decode("。"))[1])
             if index == i_index:
                 self.completeListWidget.takeItem(i)
                 self.split_chap_infos[str(index)] = None
+                self.__refresh_chap_count(i)
                 return
     
     def __show_imgs(self, book, page):
@@ -173,7 +194,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
                         item.setForeground(QBrush(Qt.red))
                 else:
                     # 没有分章信息设置分章信息
-                    item.setText(str(i) + self.decode(" 识别分章"))
+                    item.setText(self.decode("识别分章"))
                     self.__add_split_info(i, item.text())
                     item.setFont(QFont("黑体", 12, QFont.Bold))
                     item.setForeground(QBrush(Qt.red))
@@ -255,16 +276,16 @@ class BookMain(QMainWindow, Ui_MainWindow):
             cid = 1
             pcount = 0
             for i in range(count):
-                index_chapname = str(self.completeListWidget.item(i).text()).split("#\t")
-                index_chapname[0] = int(index_chapname[0])
+                index_chapname = str(self.completeListWidget.item(i).text()).split(self.decode("。"))
+                index_chapname[1] = int(index_chapname[1])
                 chapter = bookmode.Chapter()
                 chapter.author = book.author
                 chapter.bookName = book.bookName
                 chapter.cid = cid
                 cid += 1
-                chapter.cTitle = str(index_chapname[1])
-                chapter.imgCount = int(index_chapname[0] - pcount)
-                pcount = index_chapname[0]
+                chapter.cTitle = str(index_chapname[3])
+                chapter.imgCount = int(index_chapname[1] - pcount)
+                pcount = index_chapname[1]
                 chapter.nid = book.nid
                 chapters.append(chapter)
             

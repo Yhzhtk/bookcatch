@@ -10,6 +10,10 @@ import jd,bookconfig
 from bookmode import Shotbook,Chapter
 import bookorm,bookshot
 
+import socket,time
+socket.setdefaulttimeout(50)
+#这里对整个socket层设置超时时间。后续文件中如果再使用到socket，不必再设置
+
 def get_url_content(url, headers={}):
     '''以指定UA获取网页内容'''
     headers.update(bookconfig.default_header)
@@ -18,17 +22,45 @@ def get_url_content(url, headers={}):
     html = get_code_str(html)
     return html
 
-def down_file(url, path, headers={}, style=2):
+def down_file(url, path, headers={}):
+    '''下载策略，失败则多次下载'''
+    n = 3
+    sleep = 3
+    ok = False
+    for i in range(n):
+        if __down_file(url, path, headers, i):
+            ok = True
+            break
+        print "%d sleep %d and contine." % (i,sleep)
+        time.sleep(sleep)
+    print "down file:" + str(ok)
+    return ok
+
+def __down_file(url, path, headers={}, style=2):
     '''下载文件'''
-    if style == 1:
-        urllib.urlretrieve(url, path)
-    elif style == 2:
-        f = urllib2.urlopen(url)
-        data = f.read()
-        with open(path, "wb") as code:  
-            code.write(data)
-    else:
-        raise Exception,"no this style"
+    try:
+        if style == 0:
+            urllib.urlretrieve(url, path)
+            return True
+        elif style == 1:
+            headers.update(bookconfig.default_header)
+            req = urllib2.Request(url, None, headers)
+            data = urllib2.urlopen(req).read()
+            with open(path, "wb") as code:  
+                code.write(data)
+            return True
+        elif style == 2:
+            request = urllib.urlopen(url)#这里是要读取内容的url  
+            data = request.read()
+            with open(path, "wb") as code:
+                code.write(data)
+            request.close()#记得要关闭
+            return True
+        else:
+            raise Exception,"no this style"
+    except Exception, e:
+        print "down file error : " + str(e)
+        return False
 
 def regex_one(regex, content, group=1):
     '''正则查找第一个匹配返回指定分组'''
@@ -96,7 +128,7 @@ def crawl_book(bookId):
     # 如果路径不存在，则先创建路径
     if not os.path.exists(os.path.split(cover_path)[0]):
         os.makedirs(os.path.split(cover_path)[0])
-    print "begin down cover: %s" % cover_path
+    print "begin down cover: %s\n%s" % (cover_path,book.coverurl)
     down_file(book.coverurl, cover_path)
     # 安装默认方法处理封面图片
     del_cover(cover_path)
@@ -130,6 +162,3 @@ def crawl_insert_books(book_id):
 if __name__ == '__main__':
     for bid in range(30022649,30022659):
         crawl_insert_books(str(bid))
-        
-
-
