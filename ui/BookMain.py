@@ -4,7 +4,7 @@
 Module implementing BookMain.
 """
 
-from PyQt4.QtGui import QMainWindow,QListWidgetItem,QTableWidgetItem,QPixmap,QFont,QBrush,QProgressBar,QLabel
+from PyQt4.QtGui import QMainWindow,QListWidgetItem,QTableWidgetItem,QPixmap,QFont,QBrush,QProgressBar,QLabel,QMessageBox,QColor
 from PyQt4.QtCore import pyqtSignature,Qt
 from Ui_BookMain import Ui_MainWindow
 import os
@@ -190,14 +190,14 @@ class BookMain(QMainWindow, Ui_MainWindow):
                     chap_name = self.split_chap_infos[str(i)] 
                     if chap_name:
                         item.setText(chap_name)
-                        item.setFont(QFont("黑体", 12, QFont.Bold))
-                        item.setForeground(QBrush(Qt.red))
+                        self.__set_font(item, True)
                 else:
                     # 没有分章信息设置分章信息
                     item.setText(self.decode_file("识别分章"))
                     self.__add_split_info(i, self.decode_text(item.text()))
-                    item.setFont(QFont("黑体", 12, QFont.Bold))
-                    item.setForeground(QBrush(Qt.red))
+                    self.__set_font(item, True)
+            # 行间分颜色
+            self.__set_background(item, tr)
             self.imgTableWidget.setItem(tr, c, item)
         
         # 设置当前分页
@@ -214,7 +214,9 @@ class BookMain(QMainWindow, Ui_MainWindow):
         else:
             self.nextBtn.setEnabled(True)
         
-        self.show_status(self.decode_file("加载书籍 %s 章节图片成功，共有图片数 %d") % (book.bookName, imgCount))
+        # 翻页后置顶
+        self.__move_table_scroll((self.imgTableWidget.verticalScrollBar().minimumHeight()))
+        self.show_status(self.decode_file("加载书籍 %s 第 %d 页图片成功，共有图片数 %d") % (book.bookName, page + 1, imgCount))
     
     def __get_start_index(self):
         '''获取基准的index从开始，别忘了加1'''
@@ -234,6 +236,29 @@ class BookMain(QMainWindow, Ui_MainWindow):
                     chap_name = self.decode_text(self.imgTableWidget.item(x, y).text())
                     self.__add_split_info(index, chap_name)
                     print u"识别分章", index, chap_name
+        self.show_status(u"刷新分章信息 ok")
+    
+    def __move_table_scroll(self, value):
+        '''设置图片table垂直滚动条位置'''
+        self.imgTableWidget.verticalScrollBar().setValue(value)
+        
+    def __set_background(self, item, tr):
+        '''设置背景颜色'''
+        if (tr - 1) % 6 == 0:
+            item.setBackgroundColor(QColor(255,255,180))
+        elif (tr - 1) % 6 == 2:
+            item.setBackgroundColor(QColor(150,255,170))
+        else:
+            item.setBackgroundColor(QColor(255,185,255))
+    
+    def __set_font(self, item, is_split = False):
+        '''设置字体'''
+        if is_split:
+            item.setFont(QFont("黑体", 12, QFont.Bold))
+            item.setForeground(QBrush(Qt.red))
+        else:
+            item.setFont(QFont())
+            item.setForeground(QBrush(Qt.black))
     
     def decode_file(self, string):
         '''编码'''
@@ -248,7 +273,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
         self.statusLabel.setText(msg)
         
     @pyqtSignature("")
-    def on_pBtn1_clicked(self):
+    def on_refreshBookBtn_clicked(self):
         """刷新"""
         self.show_status(self.decode_file("正在加载所有书，请稍后。"))
         self.bookListWidget.clear()
@@ -259,9 +284,14 @@ class BookMain(QMainWindow, Ui_MainWindow):
         self.show_status(self.decode_file("加载需要分章的图书数量: %s") % len(books))
     
     @pyqtSignature("")
-    def on_pBtn2_clicked(self):
+    def on_saveChapterBtn_clicked(self):
         """保存分章信息"""
         # 保存当前页的分章信息
+        res = QMessageBox.question(None, u"确认保存吗？", u"保存之后再修改分章信息会很麻烦。\r\n请确定保存之前的所有分章任务已完成，不会在修改。确认保存吗？", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+        if res == QMessageBox.No:
+            '''取消的话直接退出'''
+            return
+        
         self.__deal_now_page_split_chap()
         
         count = self.completeListWidget.count()
@@ -307,12 +337,14 @@ class BookMain(QMainWindow, Ui_MainWindow):
             self.show_status(self.decode_file("保存出错了：%s" % str(e)))
     
     @pyqtSignature("")
-    def on_pBtn3_clicked(self):
+    def on_clearBtn_clicked(self):
         """清除分章"""
         (tr, c) = self.__get_current_tr_c()
         if (tr, c) != (-1, -1):
             index = self.__get_start_index() + self.__get_index(col_num, tr - 1, c)
-            self.imgTableWidget.setItem(tr, c, QTableWidgetItem(str(index)))
+            item = self.imgTableWidget.item(tr, c)
+            item.setText(str(index))
+            self.__set_font(item, False)
             self.show_status(self.decode_file("清除分章: %s") % str(index))
             
             self.__del_split_info(index)
@@ -380,6 +412,26 @@ class BookMain(QMainWindow, Ui_MainWindow):
             book = bookorm.get_book(nid, False)
             self.__show_imgs(book, nowPage)
     
+    @pyqtSignature("")
+    def on_pageBtn_clicked(self):
+        '''指定翻页'''
+        try:
+            page = int(self.decode_text(self.pageEdit.text()))
+            if page < 1 or page > int(self.decode_text(self.allPageLabel.text())):
+                self.show_status(self.decode_file("页码超出范围，请输入正确的页码"))
+                return
+            nid = self.decode_text(self.nidEdit.text())
+            book = bookorm.get_book(nid, True)
+            # 显示指定页图片数据
+            self.__show_imgs(book, page - 1)
+        except:
+            self.show_status(self.decode_file("输入页码错误，请检查。"))
+        
+    @pyqtSignature("")
+    def on_refreshChapterBtn_clicked(self):
+        """刷新章节"""
+        self.__deal_now_page_split_chap()
+    
     @pyqtSignature("QModelIndex")
     def on_bookListWidget_doubleClicked(self, index):
         """选择书"""
@@ -419,10 +471,9 @@ class BookMain(QMainWindow, Ui_MainWindow):
         chap_name = select_text.split("#")[0].split(self.decode_file("。"))[1].strip()
         (tr, c) = self.__get_current_tr_c()
         if (tr, c) != (-1, -1):
-            item = QTableWidgetItem(chap_name)
-            item.setFont(QFont("黑体", 12, QFont.Bold))
-            item.setForeground(QBrush(Qt.red))
-            self.imgTableWidget.setItem(tr, c, item)
+            item = self.imgTableWidget.item(tr, c)
+            item.setText(chap_name)
+            self.__set_font(item, True)
             self.show_status(self.decode_file("设定分章 %d : %s") % (self.__get_index(col_num, tr, c), chap_name))
             
             start_index = self.__get_start_index()
@@ -437,3 +488,4 @@ class BookMain(QMainWindow, Ui_MainWindow):
         if (r, c) != (-1, -1) and r % 2 == 0:
             img_path = self.decode_text(self.imgTableWidget.item(r, c).text())
             os.startfile(img_path)
+            

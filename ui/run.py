@@ -4,6 +4,7 @@ import BookMain
 
 
 if __name__ == "__main__":
+    # 设置默认编码
     import sys
     reload(sys)
     sys.setdefaultencoding('utf8')

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'F:\eclipse4.2\BookClient\BookMain.ui'
 #
-# Created: Thu Aug 01 12:50:09 2013
+# Created: Mon Aug 05 13:48:40 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -41,9 +41,9 @@ class Ui_MainWindow(object):
         self.booksLayout.setObjectName(_fromUtf8("booksLayout"))
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.pBtn1 = QtGui.QPushButton(self.layoutWidget)
-        self.pBtn1.setObjectName(_fromUtf8("pBtn1"))
-        self.horizontalLayout.addWidget(self.pBtn1)
+        self.refreshBookBtn = QtGui.QPushButton(self.layoutWidget)
+        self.refreshBookBtn.setObjectName(_fromUtf8("refreshBookBtn"))
+        self.horizontalLayout.addWidget(self.refreshBookBtn)
         self.booksLayout.addLayout(self.horizontalLayout)
         self.bookListWidget = QtGui.QListWidget(self.layoutWidget)
         self.bookListWidget.setBaseSize(QtCore.QSize(60, 0))
@@ -139,12 +139,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
-        self.pBtn2 = QtGui.QPushButton(self.widget)
-        self.pBtn2.setObjectName(_fromUtf8("pBtn2"))
-        self.horizontalLayout_2.addWidget(self.pBtn2)
-        self.pBtn3 = QtGui.QPushButton(self.widget)
-        self.pBtn3.setObjectName(_fromUtf8("pBtn3"))
-        self.horizontalLayout_2.addWidget(self.pBtn3)
+        self.saveChapterBtn = QtGui.QPushButton(self.widget)
+        self.saveChapterBtn.setObjectName(_fromUtf8("saveChapterBtn"))
+        self.horizontalLayout_2.addWidget(self.saveChapterBtn)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.horizontalLayout_9 = QtGui.QHBoxLayout()
         self.horizontalLayout_9.setObjectName(_fromUtf8("horizontalLayout_9"))
@@ -161,6 +158,15 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.allPageLabel)
         self.horizontalLayout_9.addLayout(self.verticalLayout_2)
         self.verticalLayout_3.addLayout(self.horizontalLayout_9)
+        self.horizontalLayout_11 = QtGui.QHBoxLayout()
+        self.horizontalLayout_11.setObjectName(_fromUtf8("horizontalLayout_11"))
+        self.pageEdit = QtGui.QLineEdit(self.widget)
+        self.pageEdit.setObjectName(_fromUtf8("pageEdit"))
+        self.horizontalLayout_11.addWidget(self.pageEdit)
+        self.pageBtn = QtGui.QPushButton(self.widget)
+        self.pageBtn.setObjectName(_fromUtf8("pageBtn"))
+        self.horizontalLayout_11.addWidget(self.pageBtn)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_11)
         self.horizontalLayout_10 = QtGui.QHBoxLayout()
         self.horizontalLayout_10.setObjectName(_fromUtf8("horizontalLayout_10"))
         self.previousBtn = QtGui.QPushButton(self.widget)
@@ -170,6 +176,15 @@ class Ui_MainWindow(object):
         self.nextBtn.setObjectName(_fromUtf8("nextBtn"))
         self.horizontalLayout_10.addWidget(self.nextBtn)
         self.verticalLayout_3.addLayout(self.horizontalLayout_10)
+        self.horizontalLayout_12 = QtGui.QHBoxLayout()
+        self.horizontalLayout_12.setObjectName(_fromUtf8("horizontalLayout_12"))
+        self.refreshChapterBtn = QtGui.QPushButton(self.widget)
+        self.refreshChapterBtn.setObjectName(_fromUtf8("refreshChapterBtn"))
+        self.horizontalLayout_12.addWidget(self.refreshChapterBtn)
+        self.clearBtn = QtGui.QPushButton(self.widget)
+        self.clearBtn.setObjectName(_fromUtf8("clearBtn"))
+        self.horizontalLayout_12.addWidget(self.clearBtn)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_12)
         self.splitter = QtGui.QSplitter(self.widget)
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         self.splitter.setObjectName(_fromUtf8("splitter"))
@@ -195,7 +210,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
-        self.pBtn1.setText(_translate("MainWindow", "Refresh", None))
+        self.refreshBookBtn.setText(_translate("MainWindow", "Refresh", None))
         self.saveBookInfoBtn.setText(_translate("MainWindow", "Save Book Info", None))
         self.coverImgLabel.setText(_translate("MainWindow", "TextLabel", None))
         self.upCoverBtn.setText(_translate("MainWindow", "Update Cover", None))
@@ -205,13 +220,15 @@ class Ui_MainWindow(object):
         self.label_3.setText(_translate("MainWindow", "type", None))
         self.label_4.setText(_translate("MainWindow", "createTime", None))
         self.label_5.setText(_translate("MainWindow", "desc", None))
-        self.pBtn2.setText(_translate("MainWindow", "Save", None))
-        self.pBtn3.setText(_translate("MainWindow", "Clear", None))
+        self.saveChapterBtn.setText(_translate("MainWindow", "Save", None))
         self.label_7.setText(_translate("MainWindow", "Page Now/All", None))
         self.nowPageLabel.setText(_translate("MainWindow", "0", None))
         self.allPageLabel.setText(_translate("MainWindow", "0", None))
+        self.pageBtn.setText(_translate("MainWindow", "Go", None))
         self.previousBtn.setText(_translate("MainWindow", "Previous", None))
         self.nextBtn.setText(_translate("MainWindow", " Next", None))
+        self.refreshChapterBtn.setText(_translate("MainWindow", "Refresh", None))
+        self.clearBtn.setText(_translate("MainWindow", "Clear", None))
 
 
 if __name__ == "__main__":
