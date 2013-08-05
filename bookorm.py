@@ -9,6 +9,9 @@ import MySQLdb
 import bookconfig
 from bookmode import Shotbook,Chapter
 
+# 连接池
+con_pool = []
+
 def insert_book(book):
     '''插入一本书的信息到数据库'''
     try:
@@ -23,7 +26,7 @@ def insert_book(book):
         
         conn.commit()
         cur.close()
-        conn.close()
+        re_conn(conn)
         
     except MySQLdb.Error,e:
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
@@ -48,7 +51,7 @@ def insert_chapter(chapters):
         
         conn.commit()
         cur.close()
-        conn.close()
+        re_conn(conn)
         
         return True
     except MySQLdb.Error,e:
@@ -79,7 +82,7 @@ def insert_book_chapter(book):
 
         conn.commit()
         cur.close()
-        conn.close()
+        re_conn(conn)
         
         return True
     except MySQLdb.Error,e:
@@ -104,7 +107,7 @@ def delete_book(nid, del_chap=False):
             
         conn.commit()
         cur.close()
-        conn.close()
+        re_conn(conn)
         
         return True
     except MySQLdb.Error,e:
@@ -124,7 +127,7 @@ def delete_chapter(nid):
             
         conn.commit()
         cur.close()
-        conn.close()
+        re_conn(conn)
         
         return True
     except MySQLdb.Error,e:
@@ -149,7 +152,7 @@ def save_book(book):
         
         conn.commit()
         cur.close()
-        conn.close()
+        re_conn(conn)
         
         return True
     except MySQLdb.Error,e:
@@ -178,7 +181,7 @@ def save_chapters(nid, chapters):
         
         conn.commit()
         cur.close()
-        conn.close()
+        re_conn(conn)
         
         return True
     except MySQLdb.Error,e:
@@ -197,7 +200,7 @@ def exist_book(book_id):
         
         conn.commit()
         cur.close()
-        conn.close()
+        re_conn(conn)
     except MySQLdb.Error,e:
         print "Mysql Error %d: %s" % (e.args[0], e.args[1])
     return result[0] != 0
@@ -213,7 +216,7 @@ def select_one(sql, get_chap=False):
         result = cur.fetchone()
         conn.commit()
         cur.close()
-        conn.close()
+        re_conn(conn)
         
         return get_mode_from_result(result, get_chap)
     
@@ -245,7 +248,7 @@ def select_many(sql, get_chap=False, start = 0, count = -1):
 
         conn.commit()
         cur.close()
-        conn.close()
+        re_conn(conn)
         
         return modes
     except MySQLdb.Error,e:
@@ -268,13 +271,32 @@ def get_chapter(nid):
 
 def get_conn():
     '''返回数据库连接，可以在此实现连接池'''
-    con = MySQLdb.Connect(host=bookconfig.host,
+    tcon = None
+    
+    for (con, use) in con_pool:
+        if not use:
+            tcon = con
+            break
+    
+    if not tcon:
+        tcon = MySQLdb.Connect(host=bookconfig.host,
                            user=bookconfig.user,
                            passwd=bookconfig.passwd,
                            port=bookconfig.port,
                            charset=bookconfig.charset)
-    con.autocommit(False)
-    return con
+        tcon.autocommit(False)
+        con_pool.append([tcon, True])
+    return tcon
+
+def re_conn(conn):
+    '''释放连接放入连接池'''
+    i = 0
+    for [con, use] in con_pool:
+        use = use # 去掉该死的提示
+        if conn == con:
+            con_pool[i][1] = False
+            return 
+        i += 1
 
 def get_mode_from_result(result, get_chap):
     '''从数据库查出来放如mode'''

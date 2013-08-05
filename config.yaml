@@ -17,7 +17,7 @@ chapter_table_name: chapter
 
 # 客户端参数
 col_num: 5 # 默认选图列数
-page_count: 100 # 每页图片数
+page_count: 10 # 每页图片数
 img_width: 200 # 默认图像宽度
 img_height: 333 # 默认图像高度
 
