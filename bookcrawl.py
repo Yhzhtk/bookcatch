@@ -131,7 +131,12 @@ def crawl_book(bookId):
         book.set_id_coverpath() # 由书名和作者名生成nid和封面路径
         catearea = regex_one(jd.cateareareg, content)
         catelist = regex_all(jd.catereg, catearea)
-        book.type = catelist[len(catelist) - 1].replace("/", "").replace("、", "")
+        cate = u"分类"
+        for i in range(len(catelist) - 1, -1, -1):
+            cate = catelist[i]
+            if cate not in ["其他", "其它"]:
+                break
+        book.type = cate.replace("/", "").replace("、", "")
         book.coverurl = regex_one(jd.coverimgreg, content)
         book.bookSize = int(float(regex_one(jd.sizereg, content)) * 1000)
         
@@ -193,5 +198,5 @@ def crawl_insert_books(book_id):
 
 if __name__ == '__main__':
     print_local_info()
-    for bid in range(30022649,30022659):
+    for bid in range(35023124,35023125):
         crawl_insert_books(str(bid))

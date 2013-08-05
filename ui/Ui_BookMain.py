@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'F:\eclipse4.2\BookClient\BookMain.ui'
 #
-# Created: Mon Aug 05 13:48:40 2013
+# Created: Mon Aug 05 16:58:38 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -185,6 +185,15 @@ class Ui_MainWindow(object):
         self.clearBtn.setObjectName(_fromUtf8("clearBtn"))
         self.horizontalLayout_12.addWidget(self.clearBtn)
         self.verticalLayout_3.addLayout(self.horizontalLayout_12)
+        self.horizontalLayout_13 = QtGui.QHBoxLayout()
+        self.horizontalLayout_13.setObjectName(_fromUtf8("horizontalLayout_13"))
+        self.chapNumEdit = QtGui.QLineEdit(self.widget)
+        self.chapNumEdit.setObjectName(_fromUtf8("chapNumEdit"))
+        self.horizontalLayout_13.addWidget(self.chapNumEdit)
+        self.autoSplitBtn = QtGui.QPushButton(self.widget)
+        self.autoSplitBtn.setObjectName(_fromUtf8("autoSplitBtn"))
+        self.horizontalLayout_13.addWidget(self.autoSplitBtn)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_13)
         self.splitter = QtGui.QSplitter(self.widget)
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         self.splitter.setObjectName(_fromUtf8("splitter"))
@@ -224,11 +233,14 @@ class Ui_MainWindow(object):
         self.label_7.setText(_translate("MainWindow", "Page Now/All", None))
         self.nowPageLabel.setText(_translate("MainWindow", "0", None))
         self.allPageLabel.setText(_translate("MainWindow", "0", None))
+        self.pageEdit.setText(_translate("MainWindow", "1", None))
         self.pageBtn.setText(_translate("MainWindow", "Go", None))
         self.previousBtn.setText(_translate("MainWindow", "Previous", None))
         self.nextBtn.setText(_translate("MainWindow", " Next", None))
         self.refreshChapterBtn.setText(_translate("MainWindow", "Refresh", None))
         self.clearBtn.setText(_translate("MainWindow", "Clear", None))
+        self.chapNumEdit.setText(_translate("MainWindow", "12", None))
+        self.autoSplitBtn.setText(_translate("MainWindow", "AutoSplit", None))
 
 
 if __name__ == "__main__":

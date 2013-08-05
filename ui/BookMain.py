@@ -68,6 +68,19 @@ class BookMain(QMainWindow, Ui_MainWindow):
             r += 1
         return (r, c)
     
+    def __get_selects_tr_c(self):
+        '''获取选中的多个item'''
+        indexs = self.imgTableWidget.selectedIndexes()
+        if not indexs or len(indexs) == 0:
+            return None
+        rcs = [(item.row(),item.column()) for item in indexs]
+        res = []
+        for (r, c) in rcs:
+            if r % 2 == 0:
+                r += 1
+            res.append((r, c))
+        return res
+    
     def __show_bookinfo(self, book):
         '''显示书的信息'''
         self.nidEdit.setText(book.nid)
@@ -235,7 +248,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
                     # 根据字体大小判断是否分章
                     chap_name = self.decode_text(self.imgTableWidget.item(x, y).text())
                     self.__add_split_info(index, chap_name)
-                    print u"识别分章", index, chap_name
+                    # print u"识别分章", index, chap_name
         self.show_status(u"刷新分章信息 ok")
     
     def __move_table_scroll(self, value):
@@ -270,6 +283,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
     
     def show_status(self, msg):
         '''状态栏显示消息'''
+        print msg
         self.statusLabel.setText(msg)
         
     @pyqtSignature("")
@@ -279,7 +293,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
         self.bookListWidget.clear()
         books = bookorm.get_all_book()
         for book in books:
-            line = book.bookName.ljust(30) + "#" + book.nid
+            line = (book.bookName + "  (" + str(book.imgCount) +")").ljust(30) + "#" + book.nid
             self.bookListWidget.addItem(QListWidgetItem(line))
         self.show_status(self.decode_file("加载需要分章的图书数量: %s") % len(books))
     
@@ -339,17 +353,21 @@ class BookMain(QMainWindow, Ui_MainWindow):
     @pyqtSignature("")
     def on_clearBtn_clicked(self):
         """清除分章"""
-        (tr, c) = self.__get_current_tr_c()
-        if (tr, c) != (-1, -1):
-            index = self.__get_start_index() + self.__get_index(col_num, tr - 1, c)
-            item = self.imgTableWidget.item(tr, c)
-            item.setText(str(index))
-            self.__set_font(item, False)
-            self.show_status(self.decode_file("清除分章: %s") % str(index))
-            
-            self.__del_split_info(index)
-        else:
+        indexs = self.__get_selects_tr_c()
+        if indexs == None:
             self.show_status(self.decode_file("请选择一张图片进行操作"))
+            return
+        
+        for (tr, c) in indexs:
+            if (tr, c) != (-1, -1):
+                index = self.__get_start_index() + self.__get_index(col_num, tr - 1, c)
+                item = self.imgTableWidget.item(tr, c)
+                item.setText(str(index))
+                self.__set_font(item, False)
+                self.show_status(self.decode_file("清除分章: %s") % str(index))
+                # 删除包括界面和内存
+                self.__del_split_info(index)
+            
             
     @pyqtSignature("")
     def on_upCoverBtn_clicked(self):
@@ -431,6 +449,53 @@ class BookMain(QMainWindow, Ui_MainWindow):
     def on_refreshChapterBtn_clicked(self):
         """刷新章节"""
         self.__deal_now_page_split_chap()
+        
+    @pyqtSignature("")
+    def on_autoSplitBtn_clicked(self):
+        """按给定章节数量自动编章"""
+        if len(self.split_chap_infos) < 1:
+            self.show_status(u"至少有一个分章才能操作。")
+            return
+        try:
+            chap_size = int(self.decode_text(self.chapNumEdit.text()))
+            if chap_size < 1 or chap_size > 20:
+                self.show_status(u"自动分章数量需在1到20之间， 请重新输入")
+                return
+        except:
+            self.show_status(u"请输入正确的章节数量。")
+        
+        # 获取书的信息
+        book = bookorm.get_book(self.decode_text(self.nidEdit.text()), False)
+        
+        # 按顺序获取每章的图片数
+        keys = [int(key) for key in self.split_chap_infos.keys()]
+        keys.sort()
+        chinfo = []
+        for i in range(1, len(keys)): 
+            chinfo.append([keys[i - 1], keys[i] - keys[i-1], self.split_chap_infos[str(keys[i - 1])]])
+        li = len(keys) - 1
+        print self.split_chap_infos
+        chinfo.append([keys[li], book.imgCount - keys[li], self.split_chap_infos[str(keys[li])]])
+        
+        # 新建新对象存储自动分章
+        new_chap_infos = {}
+        for [index, count, value] in chinfo:
+            num = (count - 1) / chap_size + 1
+            if num == 1:
+                new_chap_infos[index] = value
+            else:
+                for n in range(0, num):
+                    new_chap_infos[str(index + n * chap_size)] = u"%s（%d）" % (value, n + 1)
+        
+        # 将新对象赋给原始对象
+        self.split_chap_infos = new_chap_infos
+        
+        # 刷新显示分章
+        self.__deal_now_page_split_chap()
+        # 从新显示当前页
+        self.__show_imgs(book, int(self.decode_text(self.nowPageLabel.text())) - 1)
+        # 刷新显示分章
+        self.__deal_now_page_split_chap()
     
     @pyqtSignature("QModelIndex")
     def on_bookListWidget_doubleClicked(self, index):
@@ -467,19 +532,31 @@ class BookMain(QMainWindow, Ui_MainWindow):
     @pyqtSignature("QModelIndex")
     def on_chapListWidget_doubleClicked(self, index):
         """选择章节"""
-        select_text = self.decode_text(self.chapListWidget.currentItem().text())
-        chap_name = select_text.split("#")[0].split(self.decode_file("。"))[1].strip()
-        (tr, c) = self.__get_current_tr_c()
-        if (tr, c) != (-1, -1):
-            item = self.imgTableWidget.item(tr, c)
-            item.setText(chap_name)
-            self.__set_font(item, True)
-            self.show_status(self.decode_file("设定分章 %d : %s") % (self.__get_index(col_num, tr, c), chap_name))
-            
-            start_index = self.__get_start_index()
-            self.__add_split_info(start_index + self.__get_index(col_num, tr, c), chap_name)
-        else:
+        indexs = self.__get_selects_tr_c()
+        if indexs == None:
             self.show_status(self.decode_file("请选择一张图片进行操作"))
+            return
+        
+        index = self.chapListWidget.currentIndex().row()
+        for (tr, c) in indexs:
+            if (tr, c) != (-1, -1):
+                select_text = self.decode_text(self.chapListWidget.item(index).text())
+                chap_name = select_text.split("#")[0].split(self.decode_file("。"))[1].strip()
+                
+                item = self.imgTableWidget.item(tr, c)
+                item.setText(chap_name)
+                self.__set_font(item, True)
+                self.show_status(self.decode_file("设定分章 %d : %s") % (self.__get_index(col_num, tr, c), chap_name))
+                
+                start_index = self.__get_start_index()
+                self.__add_split_info(start_index + self.__get_index(col_num, tr, c), chap_name)
+                
+                # 依次类推
+                index += 1
+                if index >= self.chapListWidget.count():
+                    self.show_status(u"章节数不够。")
+                    break
+            
             
     @pyqtSignature("QModelIndex")
     def on_imgTableWidget_doubleClicked(self, index):
