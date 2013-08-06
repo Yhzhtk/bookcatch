@@ -7,7 +7,7 @@ Module implementing BookMain.
 from PyQt4.QtGui import QMainWindow,QListWidgetItem,QTableWidgetItem,QPixmap,QFont,QBrush,QProgressBar,QLabel,QMessageBox,QColor
 from PyQt4.QtCore import pyqtSignature,Qt
 from Ui_BookMain import Ui_MainWindow
-import os
+import os 
 # yh.book指上级目录，包就没放进来了
 from yh.book import bookmode,bookorm,bookconfig
 
@@ -202,6 +202,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
                     # 已有分章信息
                     chap_name = self.split_chap_infos[str(i)] 
                     if chap_name:
+                        # 判断是否人工删除置为了None
                         item.setText(chap_name)
                         self.__set_font(item, True)
                 else:
@@ -227,6 +228,9 @@ class BookMain(QMainWindow, Ui_MainWindow):
         else:
             self.nextBtn.setEnabled(True)
         
+        # 刷新显示分章
+        self.__deal_now_page_split_chap()
+        
         # 翻页后置顶
         self.__move_table_scroll((self.imgTableWidget.verticalScrollBar().minimumHeight()))
         self.show_status(self.decode_file("加载书籍 %s 第 %d 页图片成功，共有图片数 %d") % (book.bookName, page + 1, imgCount))
@@ -236,7 +240,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
         return (int(self.decode_text(self.nowPageLabel.text())) - 1) * page_count
     
     def __deal_now_page_split_chap(self):
-        '''保存当前页的分章信息'''
+        '''保存当前页的分章信息，保存当前页的章节更改信息'''
         c = self.imgTableWidget.columnCount()
         r = self.imgTableWidget.rowCount()
         start_index = self.__get_start_index()
@@ -464,38 +468,43 @@ class BookMain(QMainWindow, Ui_MainWindow):
         except:
             self.show_status(u"请输入正确的章节数量。")
         
+        # 刷新显示分章
+        self.__deal_now_page_split_chap()
+        
         # 获取书的信息
         book = bookorm.get_book(self.decode_text(self.nidEdit.text()), False)
         
+        # 所有的删除的数据
+        nones = [(key, value) for key, value in self.split_chap_infos.items() if not value]
         # 按顺序获取每章的图片数
-        keys = [int(key) for key in self.split_chap_infos.keys()]
+        keys = [int(key) for key in self.split_chap_infos.keys() if self.split_chap_infos[key]]
         keys.sort()
         chinfo = []
         for i in range(1, len(keys)): 
-            chinfo.append([keys[i - 1], keys[i] - keys[i-1], self.split_chap_infos[str(keys[i - 1])]])
+            chinfo.append([keys[i - 1], keys[i] - keys[i - 1], self.split_chap_infos[str(keys[i - 1])]])
         li = len(keys) - 1
         print self.split_chap_infos
         chinfo.append([keys[li], book.imgCount - keys[li], self.split_chap_infos[str(keys[li])]])
         
         # 新建新对象存储自动分章
         new_chap_infos = {}
+        new_chap_infos.update(nones)
+        
         for [index, count, value] in chinfo:
             num = (count - 1) / chap_size + 1
             if num == 1:
                 new_chap_infos[index] = value
+                print "auto split:", index, value
             else:
                 for n in range(0, num):
                     new_chap_infos[str(index + n * chap_size)] = u"%s（%d）" % (value, n + 1)
+                    print "auto split:", index + n * chap_size, value
         
         # 将新对象赋给原始对象
         self.split_chap_infos = new_chap_infos
         
-        # 刷新显示分章
-        self.__deal_now_page_split_chap()
         # 从新显示当前页
         self.__show_imgs(book, int(self.decode_text(self.nowPageLabel.text())) - 1)
-        # 刷新显示分章
-        self.__deal_now_page_split_chap()
     
     @pyqtSignature("QModelIndex")
     def on_bookListWidget_doubleClicked(self, index):
