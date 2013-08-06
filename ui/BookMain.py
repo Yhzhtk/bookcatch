@@ -215,6 +215,15 @@ class BookMain(QMainWindow, Ui_MainWindow):
             # 行间分颜色
             self.__set_background(item, tr)
             self.imgTableWidget.setItem(tr, c, item)
+        else:
+            # 移除最后一点数据
+            for lc in range(c + 1, col_num):
+                item = self.imgTableWidget.item(r, lc)
+                item.setText("")
+                item.setData(1, None)
+                item = self.imgTableWidget.item(tr, lc)
+                item.setText("")
+                self.__set_font(item, False)
         
         # 设置当前分页
         self.nowPageLabel.setText(str(page + 1))
@@ -370,9 +379,9 @@ class BookMain(QMainWindow, Ui_MainWindow):
                 item = self.imgTableWidget.item(tr, c)
                 item.setText(str(index))
                 self.__set_font(item, False)
-                self.show_status(self.decode_file("清除分章: %s") % str(index))
                 # 删除包括界面和内存
                 self.__del_split_info(index)
+                self.show_status(self.decode_file("清除分章: %s") % str(index))
             
             
     @pyqtSignature("")
@@ -476,17 +485,26 @@ class BookMain(QMainWindow, Ui_MainWindow):
         # 获取书的信息
         book = bookorm.get_book(self.decode_text(self.nidEdit.text()), False)
         
+        print "\n".join([ "before split: " + key + " " + str(value) for key, value in self.split_chap_infos.items()])
+        
         # 所有的删除的数据
         nones = [(key, value) for key, value in self.split_chap_infos.items() if not value]
         # 按顺序获取每章的图片数
         keys = [int(key) for key in self.split_chap_infos.keys() if self.split_chap_infos[key]]
         keys.sort()
+        # chinfo 存储分章信息和章节数量
         chinfo = []
-        for i in range(1, len(keys)): 
-            chinfo.append([keys[i - 1], keys[i] - keys[i - 1], self.split_chap_infos[str(keys[i - 1])]])
+        for i in range(1, len(keys)):
+            ki = keys[i - 1]
+            c = keys[i] - keys[i - 1]
+            cname = self.split_chap_infos[str(keys[i - 1])]
+            chinfo.append([ki, c, cname])
+        # 对最后一章单独处理
         li = len(keys) - 1
-        chinfo.append([keys[li], book.imgCount - keys[li], self.split_chap_infos[str(keys[li])]])
-        print "\n".join([ "before split: " + key + " " + str(value) for key, value in self.split_chap_infos.items()])
+        ki = keys[li]
+        c = book.imgCount - keys[li]
+        cname = self.split_chap_infos[str(keys[li])]
+        chinfo.append([ki, c, cname])
         
         # 新建新对象存储自动分章
         new_chap_infos = {}
@@ -495,12 +513,14 @@ class BookMain(QMainWindow, Ui_MainWindow):
         for [index, count, value] in chinfo:
             num = (count - 1) / chap_size + 1
             if num == 1:
-                new_chap_infos[index] = value
+                new_chap_infos[str(index)] = value
                 print "auto split:", index, value
             else:
                 for n in range(0, num):
-                    new_chap_infos[str(index + n * chap_size)] = u"%s（%d）" % (value, n + 1)
-                    print "auto split:", index + n * chap_size, value
+                    k = str(index + n * chap_size)
+                    v = u"%s（%d）" % (value, n + 1)
+                    new_chap_infos[k] = v
+                    print "auto split:", k, v
         
         # 将新对象赋给原始对象
         self.split_chap_infos = new_chap_infos
@@ -521,6 +541,9 @@ class BookMain(QMainWindow, Ui_MainWindow):
         self.show_status(self.decode_file("正在加载书籍 %s 的所有章节和图片，这需要一定时间，请稍后。") % select_nid)
         book = bookorm.get_book(select_nid, True)
         chapters = book.chapters
+        
+        # 最前面加上书籍名称
+        self.chapListWidget.addItem(QListWidgetItem(self.decode_file("0。%s#0") % book.bookName.ljust(30)))
         i = 0
         for chap in chapters:
             i += 1

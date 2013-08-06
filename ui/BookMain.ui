@@ -27,7 +27,7 @@
           <item>
            <widget class="QPushButton" name="refreshBookBtn">
             <property name="text">
-             <string>Refresh</string>
+             <string>Refresh Book</string>
             </property>
            </widget>
           </item>
@@ -186,7 +186,7 @@
           <item>
            <widget class="QPushButton" name="saveChapterBtn">
             <property name="text">
-             <string>Save</string>
+             <string>Save Chapter Info</string>
             </property>
            </widget>
           </item>
@@ -262,7 +262,7 @@
           <item>
            <widget class="QPushButton" name="refreshChapterBtn">
             <property name="text">
-             <string>Refresh</string>
+             <string>Refresh Page</string>
             </property>
            </widget>
           </item>

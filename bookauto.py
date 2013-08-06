@@ -7,14 +7,20 @@ Created on 2013-7-25
 
 import bookcrawl,bookshot,bookorm
 
-def get_book_ids(url="http://e.jd.com/ebook.html"):
-    content = bookcrawl.get_url_content(url)
-    ids = bookcrawl.regex_all('''href="http://e.jd.com/(\d{5,10}).html"''', content, 1)
-    print ids
+def get_book_ids(urls=["http://e.jd.com/ebook.html"]):
+    idss = []
+    for url in urls:
+        content = bookcrawl.get_url_content(url)
+        ids = bookcrawl.regex_all('''href="http://e.jd.com/(\d{5,10}).html"''', content, 1)
+        print ids
+        idss.append(ids)
     return ids
 
 if __name__ == '__main__':
-    book_ids = get_book_ids()
+    urls = []
+    for i in range(1, 5):
+        urls.append("http://e.jd.com/products/5272-5287-5507-1-%d.html" % i)
+    book_ids = get_book_ids(urls)
     for book_id in book_ids:
         print "=" * 50
         # 如果存在则跳过

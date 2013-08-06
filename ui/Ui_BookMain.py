@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'F:\eclipse4.2\BookClient\BookMain.ui'
 #
-# Created: Tue Aug 06 11:03:29 2013
+# Created: Tue Aug 06 15:51:57 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -219,7 +219,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "ChapterSplit - Bookshot", None))
-        self.refreshBookBtn.setText(_translate("MainWindow", "Refresh", None))
+        self.refreshBookBtn.setText(_translate("MainWindow", "Refresh Book", None))
         self.saveBookInfoBtn.setText(_translate("MainWindow", "Save Book Info", None))
         self.coverImgLabel.setText(_translate("MainWindow", "TextLabel", None))
         self.upCoverBtn.setText(_translate("MainWindow", "Update Cover", None))
@@ -229,7 +229,7 @@ class Ui_MainWindow(object):
         self.label_3.setText(_translate("MainWindow", "type", None))
         self.label_4.setText(_translate("MainWindow", "createTime", None))
         self.label_5.setText(_translate("MainWindow", "desc", None))
-        self.saveChapterBtn.setText(_translate("MainWindow", "Save", None))
+        self.saveChapterBtn.setText(_translate("MainWindow", "Save Chapter Info", None))
         self.label_7.setText(_translate("MainWindow", "Page Now/All", None))
         self.nowPageLabel.setText(_translate("MainWindow", "0", None))
         self.allPageLabel.setText(_translate("MainWindow", "0", None))
@@ -237,7 +237,7 @@ class Ui_MainWindow(object):
         self.pageBtn.setText(_translate("MainWindow", "Go", None))
         self.previousBtn.setText(_translate("MainWindow", "Previous", None))
         self.nextBtn.setText(_translate("MainWindow", " Next", None))
-        self.refreshChapterBtn.setText(_translate("MainWindow", "Refresh", None))
+        self.refreshChapterBtn.setText(_translate("MainWindow", "Refresh Page", None))
         self.clearBtn.setText(_translate("MainWindow", "Clear", None))
         self.chapNumEdit.setText(_translate("MainWindow", "12", None))
         self.autoSplitBtn.setText(_translate("MainWindow", "AutoSplit", None))
