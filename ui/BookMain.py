@@ -154,6 +154,8 @@ class BookMain(QMainWindow, Ui_MainWindow):
         imgCount = end - start
         rc = (imgCount - 1)/col_num + 1 # 行数
         
+        self.show_status(self.decode_file("加载书籍 %s 第 %d 页  图片数 %d， 由于网络加载需要一定时间，请等待。。") % (book.bookName, page + 1, imgCount))
+        
         # 设置行列数
         self.imgTableWidget.setColumnCount(col_num)
         self.imgTableWidget.setRowCount(rc * 2)
@@ -483,8 +485,8 @@ class BookMain(QMainWindow, Ui_MainWindow):
         for i in range(1, len(keys)): 
             chinfo.append([keys[i - 1], keys[i] - keys[i - 1], self.split_chap_infos[str(keys[i - 1])]])
         li = len(keys) - 1
-        print self.split_chap_infos
         chinfo.append([keys[li], book.imgCount - keys[li], self.split_chap_infos[str(keys[li])]])
+        print "\n".join([ "before split: " + key + " " + str(value) for key, value in self.split_chap_infos.items()])
         
         # 新建新对象存储自动分章
         new_chap_infos = {}
