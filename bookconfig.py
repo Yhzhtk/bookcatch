@@ -46,6 +46,7 @@ shot_size = (480, 800) # 截图大小
 inner_blank_sleep = (354, 467, 0.2) # 书内空白位置
 next_pos_sleep = (666, 568, 0.2) # 下一页位置，延时
 blod_para = (3, 3, 65) # 识别粗体的参数
+equal_times = 5 # 判断几次图片一样则这本书抓取结束
 
 def load_yaml(yaml_file):
     '''加载yaml配置参数'''

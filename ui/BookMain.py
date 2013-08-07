@@ -36,6 +36,13 @@ class BookMain(QMainWindow, Ui_MainWindow):
         self.statusBar.addWidget(self.progressBar, 1)
         
         self.split_chap_infos = {}
+        # 是否已保存
+        self.is_save = True
+        self.__set_save(True)
+        
+    def __set_save(self, is_save):
+        self.is_save = is_save
+        self.saveChapterBtn.setEnabled(not is_save)
         
     def __get_r_c(self, col_num, index):
         '''根据index获取所在行列'''
@@ -360,6 +367,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
             book.chapterok = 1
             bookorm.save_book(book)
             
+            self.__set_save(True)
             self.show_status(self.decode_file("保存分章信息成功：%s %s 章节数： %d") % (nid, book.bookName, len(chapters)))
         except Exception, e:
             print self.decode_file("保存出错了：%s" % str(e))
@@ -382,6 +390,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
                 # 删除包括界面和内存
                 self.__del_split_info(index)
                 self.show_status(self.decode_file("清除分章: %s") % str(index))
+                self.__set_save(False)
             
             
     @pyqtSignature("")
@@ -524,6 +533,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
         
         # 将新对象赋给原始对象
         self.split_chap_infos = new_chap_infos
+        self.__set_save(False)
         
         # 从新显示当前页
         self.__show_imgs(book, int(self.decode_text(self.nowPageLabel.text())) - 1)
@@ -531,11 +541,17 @@ class BookMain(QMainWindow, Ui_MainWindow):
     @pyqtSignature("QModelIndex")
     def on_bookListWidget_doubleClicked(self, index):
         """选择书"""
+        if not self.is_save:
+            res = QMessageBox.question(None, u"之前的编辑没保存，确认任何吗？", u"如果不保存，则此次编辑数据将丢失，确认切换到下一本吗？", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            if res == QMessageBox.No:
+                return
+        
         # 清除上一本书的信息
         self.chapListWidget.clear()
         self.imgTableWidget.clear()
         self.split_chap_infos = {}
         self.completeListWidget.clear()
+        self.__set_save(True)
         
         select_nid = self.decode_text(self.bookListWidget.currentItem().text()).split("#")[1]
         self.show_status(self.decode_file("正在加载书籍 %s 的所有章节和图片，这需要一定时间，请稍后。") % select_nid)
@@ -584,6 +600,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
                 
                 start_index = self.__get_start_index()
                 self.__add_split_info(start_index + self.__get_index(col_num, tr, c), chap_name)
+                self.__set_save(False)
                 
                 # 依次类推
                 index += 1

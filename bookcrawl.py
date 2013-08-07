@@ -198,5 +198,5 @@ def crawl_insert_books(book_id):
 
 if __name__ == '__main__':
     print_local_info()
-    for bid in range(35023124,35023125):
+    for bid in range(35023124,35023129):
         crawl_insert_books(str(bid))

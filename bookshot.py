@@ -134,7 +134,7 @@ def shot_book(img_dect, inner_blank_sleep, next_pos_sleep, nid, cid):
         if is_white(img) or is_equal(img, last_img):
             # 判断是否拍图到结束
             flag += 1
-            if flag > 1:
+            if flag >= bookconfig.equal_times:
                 i -= 1
                 break
             else:
