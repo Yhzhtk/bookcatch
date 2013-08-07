@@ -13,8 +13,8 @@ def get_book_ids(urls=["http://e.jd.com/ebook.html"]):
         content = bookcrawl.get_url_content(url)
         ids = bookcrawl.regex_all('''href="http://e.jd.com/(\d{5,10}).html"''', content, 1)
         print ids
-        idss.append(ids)
-    return ids
+        idss.extend(ids)
+    return idss
 
 if __name__ == '__main__':
     urls = []

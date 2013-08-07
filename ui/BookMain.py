@@ -340,20 +340,26 @@ class BookMain(QMainWindow, Ui_MainWindow):
             nid = self.decode_text(self.nidEdit.text())
             book = bookorm.get_book(nid, False)
             chapters = []
-            # 解析分章信息
-            cid = 1
-            pcount = 0
+            # cinfos 存储章节信息
+            cinfos = []
             for i in range(count):
                 index_chapname = self.decode_text(self.completeListWidget.item(i).text()).split(self.decode_file("。"))
-                index_chapname[1] = int(index_chapname[1])
+                cinfos.append((int(index_chapname[1]), str(index_chapname[3])))
+                
+            # 解析分章信息
+            cid = 1
+            for i in range(1, count + 1):
                 chapter = bookmode.Chapter()
                 chapter.author = book.author
                 chapter.bookName = book.bookName
                 chapter.cid = cid
                 cid += 1
-                chapter.cTitle = str(index_chapname[3])
-                chapter.imgCount = int(index_chapname[1] - pcount)
-                pcount = index_chapname[1]
+                chapter.cTitle = cinfos[i - 1][1]
+                if i == count:
+                    # 最后一章用书的总数量计算
+                    chapter.imgCount = book.imgCount - cinfos[i - 1][0] + 1
+                else:
+                    chapter.imgCount = cinfos[i][0] - cinfos[i - 1][0]
                 chapter.nid = book.nid
                 chapters.append(chapter)
             

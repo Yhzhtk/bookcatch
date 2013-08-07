@@ -143,8 +143,8 @@ def shot_book(img_dect, inner_blank_sleep, next_pos_sleep, nid, cid):
         else:
             flag = 0
         s_i = str(i)
-        if is_bold(img, bookconfig.blod_para):
-            s_i = s_i + "_b"
+        #if is_bold(img, bookconfig.blod_para):
+        #    s_i = s_i + "_b"
         hpath = path % ("h", cid, s_i)
         lpath = path % ("l", cid, s_i)
         save(img, hpath)
