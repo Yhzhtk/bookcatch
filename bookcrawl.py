@@ -169,9 +169,16 @@ def crawl_book(bookId):
         if not os.path.exists(os.path.split(cover_path)[0]):
             os.makedirs(os.path.split(cover_path)[0])
         print "begin down cover: %s\n%s" % (cover_path,book.coverurl)
-        down_file(book.coverurl, cover_path)
-        # 安装默认方法处理封面图片
-        del_cover(cover_path)
+        
+        if down_file(book.coverurl, cover_path):
+            # 安装默认方法处理封面图片
+            del_cover(cover_path)
+        else:
+            # 下载封面失败时
+            c = cover_path + ".txt"
+            with open(c, "wb") as code:  
+                code.write(book.coverurl)
+            
     except Exception:
         book = None
         print traceback.format_exc()
@@ -196,7 +203,35 @@ def crawl_insert_books(book_id):
         book = None
     return book
 
+def supply_cover_img(path):
+    '''补充封面图片'''
+    files = os.listdir(path)
+    name = ""
+    for f in files:
+        if f.endswith(".txt"):
+            name = f.replace(".txt", "")
+            break
+    if name == "":
+        print "no txt file, can't get cover name"
+        return "no txt file, can't get cover name"
+    
+    for f in files:
+        if f.endswith(".jpg"):
+            # 重命名和处理白边
+            src = path + "/" + f
+            dest = path + "/" + name
+            print src, dest
+            os.rename(src, dest)
+            del_cover(dest)
+            # 删除txt文件
+            rmf = dest + ".txt"
+            print "del", rmf
+            os.remove(rmf)
+            return "ok"
+
 if __name__ == '__main__':
-    print_local_info()
-    for bid in range(35023124,35023129):
-        crawl_insert_books(str(bid))
+#     print_local_info()
+#     for bid in range(35023124,35023129):
+#         crawl_insert_books(str(bid))
+    supply_cover_img()
+

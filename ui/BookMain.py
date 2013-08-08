@@ -9,7 +9,7 @@ from PyQt4.QtCore import pyqtSignature,Qt
 from Ui_BookMain import Ui_MainWindow
 import os 
 # yh.book指上级目录，包就没放进来了
-from yh.book import bookmode,bookorm,bookconfig
+from yh.book import bookmode,bookorm,bookconfig,bookcrawl
 
 day_path = bookconfig.rootpath + "%s/"  # 测试使用路径
 col_num = bookconfig.col_num # 默认选图列数
@@ -94,7 +94,9 @@ class BookMain(QMainWindow, Ui_MainWindow):
         self.nidEdit.setEnabled(False)
         date = book.createTime[0:10].replace("-", "")
         cover_path = day_path % date + "cover/" + book.nid[0:2] + "/" + book.nid[2:4] + "/" + book.nid[4:] + ".jpg"
-        self.coverImgLabel.setPixmap(QPixmap(cover_path))
+        self.coverImgLabel.setText(cover_path)
+        if os.path.exists(cover_path):
+            self.coverImgLabel.setPixmap(QPixmap(cover_path))
         self.bookNameEdit.setText(book.bookName)
         self.authorEdit.setText(book.author)
         self.typeEdit.setText(book.type)
@@ -433,6 +435,19 @@ class BookMain(QMainWindow, Ui_MainWindow):
         except Exception, e:
             print self.decode_file("保存出错了：%s" % str(e))
             self.show_status(self.decode_file("保存出错了：%s" % str(e)))
+    
+    @pyqtSignature("")
+    def on_dealCoverBtn_clicked(self):
+        """deal书籍信息"""
+        try:
+            nid = self.decode_text(self.nidEdit.text())
+            date = self.decode_text(self.createTimeEdit.text())[0:10].replace("-", "")
+            cover_path = day_path % date + "cover/" + nid[0:2] + "/" + nid[2:4] + "/"
+            print "cover path:", cover_path
+            res = bookcrawl.supply_cover_img(cover_path)
+            self.show_status(self.decode_file("处理封面信息" + res))
+        except Exception, e:
+            self.show_status(self.decode_file("处理封面信息失败：" + str(e)))
     
     @pyqtSignature("")
     def on_previousBtn_clicked(self):

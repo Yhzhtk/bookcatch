@@ -45,7 +45,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QWidget" name="">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QPushButton" name="saveBookInfoBtn">
@@ -62,11 +62,22 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="upCoverBtn">
-          <property name="text">
-           <string>Update Cover</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_14">
+          <item>
+           <widget class="QPushButton" name="upCoverBtn">
+            <property name="text">
+             <string>Update Cover</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="dealCoverBtn">
+            <property name="text">
+             <string>Deal Cover</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
