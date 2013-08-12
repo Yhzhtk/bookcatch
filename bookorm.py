@@ -301,6 +301,8 @@ def re_conn(conn):
 def get_mode_from_result(result, get_chap):
     '''从数据库查出来放如mode'''
     mode = None
+    if not result:
+        return mode
     if len(result) == 15:
         mode = Shotbook()
         # 利用反射赋值

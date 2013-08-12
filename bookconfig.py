@@ -41,6 +41,7 @@ fhsj_pos_sleep = (109, 74, 1) # 返回书架位置
 wdcd_pos_sleep = (118, 202, 1) # 我的畅读位置
 sx_pos_sleep = (339, 79, 1) # 刷新
 zxcd_first_pos_sleep = (492, 171, 1) # 在线畅读第一本数的位置
+down_pos_sleep = (910, 912, 0.5) # 书籍出下三角位置
 start_pos = (158, 175) # 截图左上角坐标
 shot_size = (480, 800) # 截图大小
 inner_blank_sleep = (354, 467, 0.2) # 书内空白位置

@@ -120,10 +120,15 @@ def is_equal(img1, img2, jump=1):
     print "isequal true"
     return True
 
-def shot_book(img_dect, inner_blank_sleep, next_pos_sleep, nid, cid):
+def shot_book(img_dect, inner_blank_sleep, next_pos_sleep, book, cid):
     '''拍书'''
+    if not book:
+        print "shot book can't none"
+        return
     flag = 0
-    path = bookconfig.rootpath + time.strftime("%Y%m%d") + "/content/%s/" + nid[0:2] + "/" + nid[2:4] + "/" + nid[4:] + "/%s/%s.jpg"
+    nid = book.nid
+    t = book.createTime[0:10].replace("-", "")
+    path = bookconfig.rootpath + t + "/content/%s/" + nid[0:2] + "/" + nid[2:4] + "/" + nid[4:] + "/%s/%s.jpg"
     last_img = None
     i = 0
     # 点击空白位
@@ -162,7 +167,6 @@ def shot_book(img_dect, inner_blank_sleep, next_pos_sleep, nid, cid):
 
 def pos_to_first_book(down_time=10):
     '''从上一本书的结尾定位到第一本畅读的阅读页'''
-    
     move_click_sleep(bookconfig.fhsj_pos_sleep)
     move_click_sleep(bookconfig.wdcd_pos_sleep)
     move_click_sleep(bookconfig.sx_pos_sleep)
@@ -173,16 +177,40 @@ def pos_to_first_book(down_time=10):
     move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
     move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
 
-def shot_first_book(nid, cid="1", down_time=10):
+def pos_to_loc_book(loc, down_time=10):
+    '''从上一本书的结尾定位到指定数量下拉的畅读的阅读页'''
+    move_click_sleep(bookconfig.fhsj_pos_sleep)
+    move_click_sleep(bookconfig.wdcd_pos_sleep)
+    move_click_sleep(bookconfig.sx_pos_sleep)
+    move_click_sleep(bookconfig.zxcd_first_pos_sleep)
+    # 翻到指定页
+    for i in range(loc):
+        i = i
+        move_click_sleep(bookconfig.down_pos_sleep)
+    move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
+    print "begin down book sleep: %d" % down_time
+    time.sleep(down_time) # 下载时间
+    move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
+    move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
+
+def shot_first_book(book, cid="1", down_time=10):
     '''拍最前面一本书'''
     pos_to_first_book(down_time)
     start_pos = bookconfig.start_pos
     shot_size = bookconfig.shot_size
     dect = (start_pos[0], start_pos[1], start_pos[0] + shot_size[0], start_pos[1] + shot_size[1])
-    shot_book(dect, bookconfig.inner_blank_sleep, bookconfig.next_pos_sleep, nid, cid)
+    shot_book(dect, bookconfig.inner_blank_sleep, bookconfig.next_pos_sleep, book, cid)
+
+def shot_point_book(book, loc, cid="1", down_time=10):
+    '''拍最指定位置的书'''
+    pos_to_loc_book(loc, down_time)
+    start_pos = bookconfig.start_pos
+    shot_size = bookconfig.shot_size
+    dect = (start_pos[0], start_pos[1], start_pos[0] + shot_size[0], start_pos[1] + shot_size[1])
+    shot_book(dect, bookconfig.inner_blank_sleep, bookconfig.next_pos_sleep, book, cid)
 
 if __name__ == '__main__':
     time.sleep(2)
-    nid = "49be5990e3ec92ad8e9fcc3a25b391d2"
-    shot_first_book(nid)
-
+    nid = "7738afd367cac04d3d52489a2a3e584e"
+    book = bookorm.get_book(nid)
+    shot_first_book(book)

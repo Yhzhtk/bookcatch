@@ -4,10 +4,11 @@ Created on 2013-7-25
 一键完成流程
 @author: gudh
 '''
-
+import traceback
 import bookcrawl,bookshot,bookorm
 
 def get_book_ids(urls=["http://e.jd.com/ebook.html"]):
+    '''获取一个页面内的所有id'''
     idss = []
     for url in urls:
         content = bookcrawl.get_url_content(url)
@@ -16,11 +17,14 @@ def get_book_ids(urls=["http://e.jd.com/ebook.html"]):
         idss.extend(ids)
     return idss
 
-if __name__ == '__main__':
+def shot_cates(args):
+    '''抓取一个分类里面指定页数内的所有书籍'''
     urls = []
-    for i in range(1, 5):
-        urls.append("http://e.jd.com/products/5272-5287-5507-1-%d.html" % i)
+    # 获取所有id
+    for i in range(args[1], args[2]):
+        urls.append(args[0] % i)
     book_ids = get_book_ids(urls)
+    # 循环拍书
     for book_id in book_ids:
         print "=" * 50
         # 如果存在则跳过
@@ -44,3 +48,30 @@ if __name__ == '__main__':
                 print "add book to lebook fail: " + book_id
         else:
             print "crawl book fail: " + book_id
+            
+def shot_no_success(sql, id_seq_file):
+    '''抓取已经添加但没成功的书籍'''
+    lines = open(id_seq_file, "r").read().splie("\n")
+    infos = [line.split("\t") for line in lines if line]
+    for info in infos:
+        try:
+            mode = bookorm.get_book(info[0])
+            loc = int(info[1])
+            print "=" * 50
+            print "shot point book nid: " + mode.nid + " loc:" + str(loc)
+            bookshot.shot_point_book(mode, loc)
+        except Exception, e:
+            traceback.print_exc()
+            print e
+
+if __name__ == '__main__':
+    # 抓取新数据
+    args = []
+    args.append(["http://e.jd.com/products/5272-5287-5507-1-%d.html", 1, 5])
+    args.append(["http://e.jd.com/products/5272-5287-5507-1-%d.html", 5, 10])
+    shot_cates(args)
+    
+    # 抓取没有成功的数据
+    id_seq_file = "d:/id_seq.txt"
+    shot_no_success(id_seq_file)
+    
