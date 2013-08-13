@@ -6,7 +6,7 @@ Created on 2013-8-12
 '''
 from ftplib import FTP
 import os,re,traceback,httplib,urllib
-import bookorm,bookmode
+import bookorm
 
 # FTP 参数
 default_ftp_host = "ftp.bupt.edu.cn"
@@ -18,8 +18,7 @@ bnum = 0 # 块数量
 
 # POST参数
 book_post_url = "http://192.168.1.76:8080/NovelManager/addNovel"
-chapter_post_url = "http://192.168.1.76:8080/NovelManager/AddChapter"
-
+chapter_post_url = "http://192.168.1.76:8080/NovelManager/addChapter"
 
 def get_ftp(host, user = "", pwd = ""):
     '''获取ftp连接'''
@@ -139,7 +138,7 @@ def get_para_dict(obj, filter = None):
     for (k,v) in obj.__dict__.items():
         if k in filter: # 判断是否是过滤的字段
             continue
-        paras[k] = v
+        paras[k] = str(v).encode("utf-8")
     return paras
 
 def send_data(post_url, para_dict, headers = {"Content-Type" : "application/x-www-form-urlencoded"}):
@@ -149,15 +148,14 @@ def send_data(post_url, para_dict, headers = {"Content-Type" : "application/x-ww
         host_port, path = urllib.splithost(post_url.replace("http:", "").replace("https:", ""))
         host_port = host_port.split(":")
         if len(host_port) == 2:
-            conn = httplib.HTTPConnection(host_port[0], host_port[1])
+            conn = httplib.HTTPConnection(host_port[0], host_port[1], timeout=20)
         else:
-            conn = httplib.HTTPConnection(host_port[0])
-        conn._send_request("POST", path, params, headers)
+            conn = httplib.HTTPConnection(host_port[0], timeout=20)
+        conn.request("POST", path, params, headers)
         response = conn.getresponse()
-        print response.status
         res = False
         rstr = response.read()
-        print rstr
+        print response.status, rstr
         if rstr == "1":
             res = True
         conn.close()
@@ -173,7 +171,7 @@ def send_data_retry(post_url, obj, headers = {}, retry = 3):
     if para_dict.has_key("cid"):
         isbook = False
     for i in range(retry):
-        if send_data(chapter_post_url, para_dict):
+        if send_data(post_url, para_dict):
             if isbook:
                 print "send book ok", obj.nid
             else:
@@ -203,15 +201,13 @@ def push_bookinfo(book):
 
 if __name__ == '__main__':
 #    list_ftp(None, "/pub/mirror/CPAN/")
-#     ftp_url = "/pub/Linux_Movie/Revolution_OS_With_gbSUB/ZZ.jpg"
-#     localname = "d:/m.jpg"
-#     upload_ftp_file(localname, ftp_url)
-#     close_ftp()
-#     nid = "7738afd367cac04d3d52489a2a3e584e"
-#     book = bookorm.get_book(nid, True)
-#     print push_bookinfo(book)
-    url = "http://passport.yicha.cn/user/login.do?op=login"
-    para = {"username":"apple@163.com", "password":"mail."}
-    send_data(url, para)
+#    ftp_url = "/pub/Linux_Movie/Revolution_OS_With_gbSUB/ZZ.jpg"
+#    localname = "d:/m.jpg"
+#    upload_ftp_file(localname, ftp_url)
+#    close_ftp()
+
+    nid = "7738afd367cac04d3d52489a2a3e584e"
+    book = bookorm.get_book(nid, True)
+    print push_bookinfo(book)
 
     
