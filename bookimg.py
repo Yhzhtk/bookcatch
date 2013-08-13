@@ -26,6 +26,13 @@ def zip_file(src, zip_file):
     f = zipfile.ZipFile(zip_file, 'w', zipfile.ZIP_DEFLATED)
     f.write(src)
     f.close()
+    
+def zip_files(srcs, zip_file):
+    '''打包一个文件'''
+    f = zipfile.ZipFile(zip_file, 'w', zipfile.ZIP_DEFLATED)
+    for src in srcs:
+        f.write(src)
+    f.close()
 
 def zip_path(src, zip_file):
     '''把整个文件夹内的文件打包 '''
@@ -34,9 +41,10 @@ def zip_path(src, zip_file):
     for dirpath, dirnames, filenames in os.walk("."):
         dirnames = dirnames # 去掉该死的提示
         for filename in filenames:
-            fn = os.path.join(dirpath,filename)
-            f.write(fn)
-            print "zip: %s" % fn
+            if filename.endswith(".jpg"):
+                fn = os.path.join(dirpath, filename)
+                f.write(fn)
+                print "zip: %s" % fn
     f.close()
 
 def get_move_chap_list(root, cid, start, end):
