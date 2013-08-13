@@ -6,6 +6,7 @@ Created on 2013-7-24
 '''
 import md5
 import time
+import bookconfig
 
 def getmd5(string):
     '''获取字符串的MD5'''
@@ -16,7 +17,7 @@ def getmd5(string):
 class Shotbook():
     '''书类'''
     
-    db_field_seq=("nid","jdid","bookName","author","coverImgPath","description","type","chapterList","chapterCount","imgCount","state","createTime","updateTime","chapterok","isok")
+    db_field_seq=("nid","jdid","bookName","author","coverImgPath","description","type","chapterList","chapterCount","imgCount","state","createTime","updateTime","dohost","chapterok","isok")
     
     def __init__(self, jdid=""):
         # 数据库字段
@@ -35,6 +36,7 @@ class Shotbook():
         self.updateTime = time.strftime("%Y-%m-%d %H:%M:%S") # '更新时间'
         self.chapterok = 0 # 分章是否完成，0没有，1完成
         self.isok = 0 #'是否建到索引中去，0为没有，1为已经建了',
+        self.dohost = bookconfig.dohost
         #非数据库字段
         self.coverurl = "" #封面图片Url
         self.chapters = [] #章节列表，包括章节名称和数量

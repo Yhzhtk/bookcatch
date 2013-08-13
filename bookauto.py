@@ -15,7 +15,7 @@ def get_book_ids(urls=["http://e.jd.com/ebook.html"]):
         ids = bookcrawl.regex_all('''href="http://e.jd.com/(\d{5,10}).html"''', content, 1)
         print ids
         idss.extend(ids)
-    return idss
+    return set(idss)
 
 def shot_cates(args):
     '''抓取一个分类里面指定页数内的所有书籍'''
@@ -41,7 +41,7 @@ def shot_cates(args):
                 if bookorm.insert_book_chapter(book):
                     print "insert book ok: %s" % book_id
                     d_t = book.bookSize / 50 # 根据文件大小计算下载时间，每秒50k
-                    bookshot.shot_first_book(book.nid, down_time=d_t)
+                    bookshot.shot_first_book(book, down_time=d_t)
                 else:
                     print "insert book fail: %s" % book_id
             else:
@@ -51,13 +51,14 @@ def shot_cates(args):
             
 def shot_no_success(sql, id_seq_file):
     '''抓取已经添加但没成功的书籍'''
-    lines = open(id_seq_file, "r").read().splie("\n")
+    lines = open(id_seq_file, "r").read().split("\n")
     infos = [line.split("\t") for line in lines if line]
     for info in infos:
         try:
             mode = bookorm.get_book(info[0])
             loc = int(info[1])
             print "=" * 50
+            print mode.bookName
             print "shot point book nid: " + mode.nid + " loc:" + str(loc)
             bookshot.shot_point_book(mode, loc)
         except Exception, e:
@@ -69,9 +70,10 @@ if __name__ == '__main__':
     args = []
     args.append(["http://e.jd.com/products/5272-5287-5507-1-%d.html", 1, 5])
     args.append(["http://e.jd.com/products/5272-5287-5507-1-%d.html", 5, 10])
-    shot_cates(args)
+    for arg in args:
+        shot_cates(arg)
     
     # 抓取没有成功的数据
-    id_seq_file = "d:/id_seq.txt"
-    shot_no_success(id_seq_file)
-    
+#     id_seq_file = "d:/id_seq.txt"
+#     shot_no_success(id_seq_file)
+

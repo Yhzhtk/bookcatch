@@ -23,8 +23,11 @@ charset="utf8"
 db_name = "ebook"
 book_table_name = "shotbook"
 chapter_table_name = "chapter"
+# 主机
+dohost = "A1"
 
 # 客户端参数
+all_sql = "select * from shotbook"
 col_num = 5 # 默认选图列数
 page_count = 10 # 每页图片数
 img_width = 200 # 默认图像宽度

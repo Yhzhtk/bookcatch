@@ -260,8 +260,8 @@ def get_book(nid, get_chap=False):
     return select_one(sql, get_chap)
 
 def get_all_book(get_chap=False):
-    '''获取所有书籍'''
-    sql = "select * from " + bookconfig.book_table_name
+    '''以配置文件sql获取所有书籍'''
+    sql = bookconfig.all_sql
     return select_many(sql, get_chap)
 
 def get_chapter(nid):
@@ -303,7 +303,7 @@ def get_mode_from_result(result, get_chap):
     mode = None
     if not result:
         return mode
-    if len(result) == 15:
+    if len(result) == 16:
         mode = Shotbook()
         # 利用反射赋值
         for (i,m) in enumerate(Shotbook.db_field_seq):
