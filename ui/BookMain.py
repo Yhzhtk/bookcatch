@@ -142,7 +142,16 @@ class BookMain(QMainWindow, Ui_MainWindow):
         self.completeListWidget.insertItem(loc, QListWidgetItem(str(loc)  + self.decode_file("。") + str(index) + self.decode_file("。(") + str(index - last_index) + self.decode_file(")。")+ chap_name))
         if is_add:
             self.__refresh_chap_count(loc + 1)
-        
+    
+    def __add_all_split_info(self):
+        '''添加所有分章信息'''
+        indexs = [ int(k) for k, v in self.split_chap_infos.items() if v != None]
+        indexs.sort()
+        self.completeListWidget.clear()
+        for index in indexs:
+            v = self.split_chap_infos[str(index)]
+            self.__add_split_info(index, v)
+    
     def __del_split_info(self, index):
         '''删除分章信息'''
         for i in range(self.completeListWidget.count()):
@@ -227,12 +236,20 @@ class BookMain(QMainWindow, Ui_MainWindow):
         else:
             # 移除最后一点数据
             for lc in range(c + 1, col_num):
-                item = self.imgTableWidget.item(r, lc)
-                item.setText("")
-                item.setData(1, None)
-                item = self.imgTableWidget.item(tr, lc)
-                item.setText("")
-                self.__set_font(item, False)
+                if page == 0:
+                    item = QTableWidgetItem("blank")
+                    self.__set_font(item, False)
+                    self.imgTableWidget.setItem(r, lc, item)
+                    item = QTableWidgetItem("blank")
+                    self.__set_font(item, False)
+                    self.imgTableWidget.setItem(tr, lc, item)
+                else:
+                    item = self.imgTableWidget.item(r, lc)
+                    item.setText("")
+                    item.setData(1, None)
+                    item = self.imgTableWidget.item(tr, lc)
+                    item.setText("")
+                    self.__set_font(item, False)
         
         # 设置当前分页
         self.nowPageLabel.setText(str(page + 1))
@@ -556,6 +573,8 @@ class BookMain(QMainWindow, Ui_MainWindow):
         self.split_chap_infos = new_chap_infos
         self.__set_save(False)
         
+        # 添加所有分章信息
+        self.__add_all_split_info()
         # 从新显示当前页
         self.__show_imgs(book, int(self.decode_text(self.nowPageLabel.text())) - 1)
     

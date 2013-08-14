@@ -193,7 +193,7 @@ def pos_to_loc_book(loc, down_time=10):
     move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
     move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
 
-def shot_first_book(book, cid="1", down_time=10):
+def shot_first_book(book, cid="1", down_time=15):
     '''拍最前面一本书'''
     pos_to_first_book(down_time)
     start_pos = bookconfig.start_pos
@@ -201,7 +201,7 @@ def shot_first_book(book, cid="1", down_time=10):
     dect = (start_pos[0], start_pos[1], start_pos[0] + shot_size[0], start_pos[1] + shot_size[1])
     shot_book(dect, bookconfig.inner_blank_sleep, bookconfig.next_pos_sleep, book, cid)
 
-def shot_point_book(book, loc, cid="1", down_time=10):
+def shot_point_book(book, loc, cid="1", down_time=15):
     '''拍最指定位置的书'''
     pos_to_loc_book(loc, down_time)
     start_pos = bookconfig.start_pos
