@@ -23,9 +23,9 @@ chapter_table_name: chapter
 dohost: A1
 
 # 客户端参数
-all_sql: select * from shotbook limit 1
+all_sql: select * from shotbook
 col_num: 5 # 默认选图列数
-page_count: 20 # 每页图片数
+page_count: 50 # 每页图片数
 img_width: 200 # 默认图像宽度
 img_height: 333 # 默认图像高度
 

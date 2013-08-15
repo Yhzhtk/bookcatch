@@ -292,9 +292,11 @@ class BookMain(QMainWindow, Ui_MainWindow):
                     # print u"识别分章", index, chap_name
         self.show_status(u"刷新分章信息 ok")
     
-    def __move_table_scroll(self, value):
+    def __move_table_scroll(self, value, maxinum = None):
         '''设置图片table垂直滚动条位置'''
         self.imgTableWidget.verticalScrollBar().setValue(value)
+        if maxinum:
+            self.imgTableWidget.verticalScrollBar().setMaximum(maxinum)
         
     def __set_background(self, item, tr):
         '''设置背景颜色'''
@@ -648,7 +650,24 @@ class BookMain(QMainWindow, Ui_MainWindow):
                     self.show_status(u"章节数不够。")
                     break
             
-            
+    @pyqtSignature("QModelIndex")
+    def on_completeListWidget_doubleClicked(self, index):
+        '''双击已添加章节信息，调到指定图片位置'''
+        sel_text = self.completeListWidget.item(index.row()).text()
+        sel_index = int(sel_text.split(u"。")[1]) - 1
+        print u"跳到指定位置 %d" % sel_index
+        
+        now_page = int(self.nowPageLabel.text()) - 1
+        page = sel_index / page_count
+        if page != now_page:
+            nid = self.nidEdit.text()
+            book = bookorm.get_book(nid)
+            self.__show_imgs(book, page)
+        
+        loc = sel_index % page_count
+        loc = loc / col_num * 2
+        self.__move_table_scroll(loc, self.imgTableWidget.rowCount())
+        
     @pyqtSignature("QModelIndex")
     def on_imgTableWidget_doubleClicked(self, index):
         """打开大图"""
