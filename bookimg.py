@@ -1,12 +1,11 @@
 # coding=utf-8
 '''
 Created on 2013-8-7
-图片章节处理，打包上传等
+图片章节处理，打包解包
 @author: gudh
 '''
-import os,zipfile
-import Image
-import bookorm, bookconfig,bookshot
+import os,zipfile,time,traceback
+import bookorm, bookconfig
 
 def unzip(src, dest):
     '''解压zip'''
@@ -29,10 +28,14 @@ def zip_file(src, zip_file):
     
 def zip_files(srcs, zip_file):
     '''打包一个文件'''
+    print u"打包 %d 个文件到 %s" % (len(srcs), zip_file)
+    start = time.clock()
     f = zipfile.ZipFile(zip_file, 'w', zipfile.ZIP_DEFLATED)
     for src in srcs:
         f.write(src)
     f.close()
+    end = time.clock()
+    print u"打包成功，使用时间: %d" % (end - start)
 
 def zip_path(src, zip_file):
     '''把整个文件夹内的文件打包 '''
@@ -47,6 +50,34 @@ def zip_path(src, zip_file):
                 print "zip: %s" % fn
     f.close()
 
+def zip_book(book, zip_file):
+    '''打包书籍信息到指定文件'''
+    try:
+        chapters = book.chapters
+        nid = book.nid
+        root_path = bookconfig.rootpath + book.createTime[0:10].replace("-", "")
+        # 切换到相对路径
+        os.chdir(root_path)
+        # 加载所有需要打包的书籍
+        files = []
+        # 封面
+        cover_path = root_path + "/cover/%s" % book.coverImgPath
+        files.append(cover_path)
+        # 内容
+        root_path = root_path + "/content/%s/" + nid[0:2] + "/" + nid[2:4] + "/" + nid[4:] + "/%d/%d.jpg"
+        for chapter in chapters:
+            for i in range(1, chapter.imgCount + 1):
+                f = root_path % ("h", chapter.cid, i)
+                files.append(f)
+                f = root_path % ("l", chapter.cid, i)
+                files.append(f)
+        # 压缩
+        zip_files(files, zip_file)
+        return os.path.getsize(zip_file) > 0
+    except:
+        traceback.print_exc()
+        return False
+        
 def get_move_chap_list(root, cid, start, end):
     '''获取将要移动章节的图片信息'''
     try:
@@ -64,7 +95,7 @@ def get_move_chap_list(root, cid, start, end):
             if not os.path.exists(src):
                 src = hsrc_path + str(i) + "_b.jpg"
             if not os.path.exists(src):
-                raise Exception, "path: %d is not exist, move_chap error"
+                raise Exception, "path: %s is not exist, move_chap error" % src
                 return (False, None)
             move_list.append((src, dest))
             # 添加小图
@@ -78,8 +109,8 @@ def get_move_chap_list(root, cid, start, end):
             move_list.append((src, dest))
         
         return (True, move_list)
-    except Exception, e:
-        print "move chap error: %s" % str(e)
+    except:
+        traceback.print_exc()
         return (False, None)
 
 def move_book_back(path):
@@ -111,7 +142,7 @@ def move_book(book):
     '''完善book的章节图片移动处理'''
     try:
         print "=" * 50
-        print "begin move book chapter img", book.bookName, book.nid
+        print "begin move book chapter img：", book.nid, book.bookName
         chapters = book.chapters
         nid = book.nid
         root_path = bookconfig.rootpath + book.createTime[0:10].replace("-", "")
@@ -138,16 +169,15 @@ def move_book(book):
         print "error: %s" % str(e)
         return False
 
-#zip_path(r"F:\ebook\20130807", r"F:\20130807.zip")
-#unzip(r"F:\20130807.zip", "F:/xx/")
-def complete_books():
-    sql = "select * from shotbook where chapterok = 1 and nid = ''"
-    books = bookorm.select_many(sql, True)
-    for book in books:
-        if move_book(book):
-            book.chapterok = 2
-            book.upTime()
-            bookorm.save_book(book)
+def move_update_book(book):
+    '''按章节信息移动书籍并更新数据库'''
+    return True ## ssss
+    if move_book(book):
+        book.chapterok = 2
+        book.upTime()
+        bookorm.save_book(book)
+        return True
+    
+    return False
 
-#complete_books()
-move_book_back(r"F:\ebook\20130806\content\l\e1\8a\d7dfdb59aa985687ebe71220f6d5/")
+#move_book_back(r"F:\ebook\20130806\content\l\e1\8a\d7dfdb59aa985687ebe71220f6d5/")

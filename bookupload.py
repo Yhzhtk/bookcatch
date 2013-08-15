@@ -1,15 +1,15 @@
 # encoding=utf-8
 '''
 Created on 2013-8-12
-使用ftp上传文件
+使用ftp上传文件,使用Post发送信息
 @author: gudh
 '''
 from ftplib import FTP
-import os,re,traceback,httplib,urllib
+import os,re,traceback,httplib,urllib,time
 import bookorm
 
 # FTP 参数
-default_ftp_host = "ftp.bupt.edu.cn"
+default_ftp_host = "43.253.150.171"
 ftp_pool = {}
 filesize = 0 # 文件大小
 rlen = 0 # 记录上传下载的量
@@ -20,7 +20,7 @@ bnum = 0 # 块数量
 book_post_url = "http://192.168.1.76:8080/NovelManager/addNovel"
 chapter_post_url = "http://192.168.1.76:8080/NovelManager/addChapter"
 
-def get_ftp(host, user = "", pwd = ""):
+def get_ftp(host, user = "book_ftp", pwd = "3$book@yicha#2013#"):
     '''获取ftp连接'''
     if not host:
         host = default_ftp_host
@@ -32,7 +32,9 @@ def get_ftp(host, user = "", pwd = ""):
     if not user and not pwd:
         ftp.login()
     else:
-        ftp.login(user, pwd) # 登录
+        ftp.login(user, pwd[2:-1].replace("#", "_")) # 登录
+    # python的默认ftplib启用passive（被动模式），因为被动模式会启用1024之后的端口，所以就会出现问题error: [Errno 10060]
+    ftp.set_pasv(False)
     wel = ftp.getwelcome() # 获得欢迎信息 
     print "ftp welcome:", wel
     if wel.startswith("220"):
@@ -60,24 +62,53 @@ def upload_file(host, local_filename, ftp_filename):
     file_handler = open(local_filename, 'rb')
     ftp.cwd(os.path.dirname(ftp_filename))
     name = os.path.basename(ftp_filename)
+    global rlen, bnum, filesize
     rlen = 0 # 记录上传下载的量
     bnum = 0 # 块数量
     filesize = os.path.getsize(local_filename)
     def callback(data):
         global rlen, bnum, filesize
-        file_handler.write(data)
         rlen = rlen + len(data)
         if rlen / bsize >= bnum:
             bnum += 1
-            print "up size: %d bytes / %d bytes" % rlen, filesize
+            print "up size: %d bytes / %d bytes" % (rlen, filesize)
     ftp.storbinary('STOR %s' % name, file_handler, callback=callback)# 上传FTP文件
     file_handler.close()
     ftp.set_debuglevel(0)
 
+def upload_ftp_file(localname, ftp_url):
+    '''上传文件至ftp'''
+    try:
+        start = time.clock()
+        host = re.compile("(ftp://.*?)/", re.DOTALL).search(ftp_url)
+        if host:
+            host = host.group(1)
+            host = host[6:]
+            name = ftp_url.replace(host, "")
+        else:
+            name = ftp_url
+        print host, name
+        upload_file(host, localname, name)
+        end = time.clock()
+        print u"use time: %d" % (end - start)
+        return True
+    except:
+        traceback.print_exc()
+        return False
+
+def upload_update_book(book, zip_file, ftp_url):
+    '''上传打包文件到ftp，更新数据库'''
+    if upload_ftp_file(zip_file, ftp_url):
+        book.chapterok = 3
+        book.upTime()
+        bookorm.save_book(book)
+        return True
+    return False
+
 def download_file(host, ftp_filename, local_filename):
     '''在指定host下载文件'''
     ftp = get_ftp(host)
-    ftp.set_debuglevel(2) # 打开调试级别2，显示详细信息; 0为关闭调试信息 
+    ftp.set_debuglevel(2) # 打开调试级别2，显示详细信息; 0为关闭调试信息
     ftp.cwd(os.path.dirname(ftp_filename))
     name = os.path.basename(ftp_filename)
     file_handler = open(local_filename, 'wb') #以写模式在本地打开文件
@@ -108,23 +139,6 @@ def download_ftp_file(ftp_url, localname):
             name = ftp_url
         print host, name
         download_file(host, name, localname)
-        return True
-    except:
-        traceback.print_exc()
-        return False
-
-def upload_ftp_file(localname, ftp_url):
-    '''上传文件至ftp'''
-    try:
-        host = re.compile("(ftp://.*?)/", re.DOTALL).search(ftp_url)
-        if host:
-            host = host.group(1)
-            host = host[6:]
-            name = ftp_url.replace(host, "")
-        else:
-            name = ftp_url
-        print host, name
-        upload_file(host, localname, name)
         return True
     except:
         traceback.print_exc()
@@ -199,15 +213,24 @@ def push_bookinfo(book):
     
     return True
 
-if __name__ == '__main__':
-#    list_ftp(None, "/pub/mirror/CPAN/")
-#    ftp_url = "/pub/Linux_Movie/Revolution_OS_With_gbSUB/ZZ.jpg"
-#    localname = "d:/m.jpg"
-#    upload_ftp_file(localname, ftp_url)
-#    close_ftp()
+def push_update_book(book):
+    '''发送数据信息，并更新数据库'''
+    if push_bookinfo(book):
+        book.chapterok = 4
+        book.upTime()
+        bookorm.save_book(book)
+        return True
+    return False
 
-    nid = "7738afd367cac04d3d52489a2a3e584e"
-    book = bookorm.get_book(nid, True)
-    print push_bookinfo(book)
+if __name__ == '__main__':
+    #list_ftp(None, "/")
+    ftp_url = "/ebook/z.jpg"
+    localname = "d:/m.jpg"
+    upload_ftp_file(localname, ftp_url)
+    close_ftp()
+
+#     nid = "7738afd367cac04d3d52489a2a3e584e"
+#     book = bookorm.get_book(nid, True)
+#     print push_bookinfo(book)
 
     
