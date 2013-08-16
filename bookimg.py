@@ -136,7 +136,7 @@ def move_book_back(path):
 
     for m in move_infos:
         os.renames(m[0], m[1])
-        print m[0], m[1]
+        print m[0], os.path.basename(m[1])
           
 def move_book(book):
     '''完善book的章节图片移动处理'''
@@ -163,7 +163,7 @@ def move_book(book):
         print "begin move, total length: %d" % len(all_move_list)
         for src_dest in all_move_list:
             os.renames(src_dest[0], src_dest[1])
-            print "%s to %s" % (src_dest[0], src_dest[1])
+            print "%s to %s" % (os.path.basename(src_dest[0]), src_dest[1])
         return True
     except Exception, e:
         print "error: %s" % str(e)
@@ -171,7 +171,6 @@ def move_book(book):
 
 def move_update_book(book):
     '''按章节信息移动书籍并更新数据库'''
-    return True ## ssss
     if move_book(book):
         book.chapterok = 2
         book.upTime()

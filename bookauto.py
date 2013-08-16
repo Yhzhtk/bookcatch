@@ -20,10 +20,10 @@ def old_shot():
     bookrun.shot_no_success(id_seq_file)
 
 def online():
-    sql = "select * from shotbook where chapterok = 1"
+    sql = "select * from shotbook where dohost = 'A1' and chapterok = 1 order by createTime limit 2"
     books = bookorm.select_many(sql, True)
     for book in books:
-        if bookrun.online_book(book):
+        if bookrun.move_zip_book(book):
             print "OnLine Ok %s %s" % (book.nid, book.bookName)
         else:
             print "OnLine Fail %s %s" % (book.nid, book.bookName)

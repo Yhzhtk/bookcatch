@@ -25,6 +25,7 @@ def shot_cates(args):
     for i in range(args[1], args[2]):
         urls.append(args[0] % i)
     book_ids = get_book_ids(urls)
+    err_num = 0
     # 循环拍书
     for book_id in book_ids:
         print "=" * 50
@@ -44,7 +45,11 @@ def shot_cates(args):
                     d_t = book.bookSize / 50 # 根据文件大小计算下载时间，每秒50k
                     if d_t < 15:
                         d_t = 15
-                    bookshot.shot_first_book(book, down_time=d_t)
+                    if not bookshot.shot_first_book(book, down_time=d_t):
+                        err_num += 1
+                        if err_num >= 5:
+                            print "连续失败书过多，结束拍书"
+                            return
                 else:
                     print "insert book fail: %s" % book_id
             else:
@@ -85,7 +90,7 @@ def complete(id_seq_file):
         book.upTime()
         bookorm.insert_book_chapter(book)
 
-def online_book(book):
+def move_zip_book(book):
     '''上线书籍'''
     print "=" * 50
     print u"%s %s" % (book.nid, book.bookName)
@@ -96,22 +101,30 @@ def online_book(book):
         print u"2、开始打包zip： %s" % zip_file
         if bookimg.zip_book(book, zip_file):
             print u"打包书籍成功"
-            ftp_url = "/ebook_zip/%s" % zip_file
-            print u"3、开始上传到ftp: %s" % ftp_url
-            if bookupload.upload_update_book(book, zip_file, ftp_url):
-                print u"上传ftp成功"
-                print u"3、开始发送书籍信息: %s" % ftp_url
-                if bookupload.push_update_book(book):
-                    print u"发送书籍信息成功"
-                    
-                    return True
-                else:
-                    print u"发送数据信息失败"
-            else:
-                print u"上传ftp失败"
+            line = "/ftp/ebook_zip/%s\t%s\t%d\n" % (zip_file, book.createTime[0:10].replace("-", ""), (2 * book.imgCount + 1))
+            file = open(bookconfig.uploadfile, "a")
+            file.write(line)
+            file.close()
+            return True
         else:
             print u"打包书籍失败"
     else:
         print "分章移动更新失败"
     return False
 
+def upload_ftp_book(book):
+    '''上传到ftp'''
+    zip_file = bookconfig.rootpath + book.createTime[0:10].replace("-", "") + ("nid_%s.zip" % book.nid)
+    ftp_url = "/ebook_zip/%s" % zip_file
+    print u"3、开始上传到ftp: %s" % ftp_url
+    if bookupload.upload_update_book(book, zip_file, ftp_url):
+        print u"上传ftp成功"
+        print u"3、开始发送书籍信息: %s" % ftp_url
+        if bookupload.push_update_book(book):
+            print u"发送书籍信息成功"
+            return True
+        else:
+            print u"发送数据信息失败"
+    else:
+        print u"上传ftp失败"
+    return False

@@ -164,6 +164,7 @@ def shot_book(img_dect, inner_blank_sleep, next_pos_sleep, book, cid):
     book.imgCount = i
     book.upTime()
     bookorm.save_book(book)
+    return book.imgCount > 5
 
 def pos_to_first_book(down_time=10):
     '''从上一本书的结尾定位到第一本畅读的阅读页'''
@@ -199,7 +200,7 @@ def shot_first_book(book, cid="1", down_time=15):
     start_pos = bookconfig.start_pos
     shot_size = bookconfig.shot_size
     dect = (start_pos[0], start_pos[1], start_pos[0] + shot_size[0], start_pos[1] + shot_size[1])
-    shot_book(dect, bookconfig.inner_blank_sleep, bookconfig.next_pos_sleep, book, cid)
+    return shot_book(dect, bookconfig.inner_blank_sleep, bookconfig.next_pos_sleep, book, cid)
 
 def shot_point_book(book, loc, cid="1", down_time=15):
     '''拍最指定位置的书'''
@@ -207,7 +208,7 @@ def shot_point_book(book, loc, cid="1", down_time=15):
     start_pos = bookconfig.start_pos
     shot_size = bookconfig.shot_size
     dect = (start_pos[0], start_pos[1], start_pos[0] + shot_size[0], start_pos[1] + shot_size[1])
-    shot_book(dect, bookconfig.inner_blank_sleep, bookconfig.next_pos_sleep, book, cid)
+    return shot_book(dect, bookconfig.inner_blank_sleep, bookconfig.next_pos_sleep, book, cid)
 
 if __name__ == '__main__':
     time.sleep(2)
