@@ -269,6 +269,22 @@ def get_chapter(nid):
     sql = "select * from %s where nid= '%s'" % (bookconfig.chapter_table_name, nid)
     return select_many(sql, False)
 
+def check_con(conn):
+    '''检查数据库连接是否可用'''
+    sql = "select 1"
+    try:
+        cur = conn.cursor()
+        conn.select_db(bookconfig.db_name)
+        cur.execute(sql)
+        result = cur.fetchone()
+        conn.commit()
+        cur.close()
+        re_conn(conn)
+        return result[0] == 1
+    except MySQLdb.Error,e:
+        print "Mysql Error %d: %s" % (e.args[0], e.args[1])
+        return False
+
 def get_conn():
     '''返回数据库连接，可以在此实现连接池'''
     tcon = None
@@ -277,6 +293,11 @@ def get_conn():
         if not use:
             tcon = con
             break
+    
+    if tcon and not check_con(tcon):
+        # 如果连接不可用，从连接池删除，重置None
+        del con_pool[tcon]
+        tcon = None
     
     if not tcon:
         tcon = MySQLdb.Connect(host=bookconfig.host,
