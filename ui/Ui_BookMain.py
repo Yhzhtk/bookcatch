@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'F:\eclipse4.2\BookClient\BookMain.ui'
 #
-# Created: Thu Aug 08 11:07:28 2013
+# Created: Wed Aug 21 15:16:09 2013
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -54,9 +54,15 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtGui.QVBoxLayout(self.widget)
         self.verticalLayout.setMargin(0)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.horizontalLayout_15 = QtGui.QHBoxLayout()
+        self.horizontalLayout_15.setObjectName(_fromUtf8("horizontalLayout_15"))
         self.saveBookInfoBtn = QtGui.QPushButton(self.widget)
         self.saveBookInfoBtn.setObjectName(_fromUtf8("saveBookInfoBtn"))
-        self.verticalLayout.addWidget(self.saveBookInfoBtn)
+        self.horizontalLayout_15.addWidget(self.saveBookInfoBtn)
+        self.refreshCoverBtn = QtGui.QPushButton(self.widget)
+        self.refreshCoverBtn.setObjectName(_fromUtf8("refreshCoverBtn"))
+        self.horizontalLayout_15.addWidget(self.refreshCoverBtn)
+        self.verticalLayout.addLayout(self.horizontalLayout_15)
         self.coverImgLabel = QtGui.QLabel(self.widget)
         self.coverImgLabel.setObjectName(_fromUtf8("coverImgLabel"))
         self.verticalLayout.addWidget(self.coverImgLabel)
@@ -227,6 +233,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "ChapterSplit - Bookshot", None))
         self.refreshBookBtn.setText(_translate("MainWindow", "Refresh Book", None))
         self.saveBookInfoBtn.setText(_translate("MainWindow", "Save Book Info", None))
+        self.refreshCoverBtn.setText(_translate("MainWindow", "Refresh Book", None))
         self.coverImgLabel.setText(_translate("MainWindow", "TextLabel", None))
         self.upCoverBtn.setText(_translate("MainWindow", "Update Cover", None))
         self.dealCoverBtn.setText(_translate("MainWindow", "Deal Cover", None))

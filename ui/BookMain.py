@@ -469,6 +469,16 @@ class BookMain(QMainWindow, Ui_MainWindow):
             self.show_status(self.decode_file("处理封面信息失败：" + str(e)))
     
     @pyqtSignature("")
+    def on_refreshCoverBtn_clicked(self):
+        """刷新书籍信息"""
+        try:
+            nid = self.decode_text(self.nidEdit.text())
+            book = bookorm.get_book(nid)
+            self.__show_bookinfo(book)
+        except Exception, e:
+            self.show_status(self.decode_file("处理封面信息失败：" + str(e)))
+    
+    @pyqtSignature("")
     def on_previousBtn_clicked(self):
         """上一页"""
         # 保存当前页的分章信息
