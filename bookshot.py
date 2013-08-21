@@ -184,15 +184,28 @@ def pos_to_loc_book(loc, down_time=10):
     move_click_sleep(bookconfig.wdcd_pos_sleep)
     move_click_sleep(bookconfig.sx_pos_sleep)
     move_click_sleep(bookconfig.zxcd_first_pos_sleep)
+    
+    # 
+    down_times = loc
+    row_num = 0
+    if down_times > bookconfig.max_down_times:
+        # 超过最大下翻页则移动位置
+        down_times = bookconfig.max_down_times
+        row_num = loc - down_times
     # 翻到指定页
-    for i in range(loc):
+    for i in range(down_times):
         i = i
         move_click_sleep(bookconfig.down_pos_sleep)
-    move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
+    # 计算需要点击的位置
+    book_pos = bookconfig.zxcd_first_pos_sleep[:]
+    book_pos[1] = book_pos[1] + (row_num * bookconfig.row_height)
+    
+    # 移动位置，下载，打开
+    move_double_click_sleep(book_pos)
     print "begin down book sleep: %d" % down_time
     time.sleep(down_time) # 下载时间
-    move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
-    move_double_click_sleep(bookconfig.zxcd_first_pos_sleep)
+    move_double_click_sleep(book_pos)
+    move_double_click_sleep(book_pos)
 
 def shot_first_book(book, cid="1", down_time=15):
     '''拍最前面一本书'''

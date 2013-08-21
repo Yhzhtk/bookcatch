@@ -52,6 +52,10 @@ next_pos_sleep = (666, 568, 0.2) # 下一页位置，延时
 blod_para = (3, 3, 65) # 识别粗体的参数
 equal_times = 5 # 判断几次图片一样则这本书抓取结束
 
+# 新添不能下翻移动鼠标的参数
+max_down_times = 48 # 最大允许的下翻次数
+row_height = 250 # 行高
+
 # 上传配置信息
 uploadfile = rootpath + "upload.txt"
 downloadfile = rootpath + "download.txt"
