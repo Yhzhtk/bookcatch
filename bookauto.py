@@ -4,7 +4,7 @@ Created on 2013-7-25
 一键完成流程
 @author: gudh
 '''
-import bookrun, bookorm
+import bookrun, bookorm, bookupload
 
 def new_shot():
     '''抓新书'''
@@ -19,7 +19,8 @@ def old_shot():
     id_seq_file = "d:/id_seq.txt"
     bookrun.shot_no_success(id_seq_file)
 
-def online():
+def move_zip():
+    '''移动章节打包'''
     sql = "select * from shotbook where dohost = 'A1' and chapterok = 1 order by createTime limit 2"
     books = bookorm.select_many(sql, True)
     for book in books:
@@ -28,6 +29,23 @@ def online():
         else:
             print "OnLine Fail %s %s" % (book.nid, book.bookName)
 
+def get_upload_back():
+    '''获取上传解压信息反馈，并更新数据库'''
+    ftp_url = "download.txt"
+    print "begin update upload book"
+    bookupload.update_upload_book(ftp_url)
+    print "update upload end"
+
+def post_data():
+    '''发送书籍信息'''
+    sql = "select * from shotbook where dohost = 'A1' and chapterok = 3 and nid = '' order by createTime limit 2"
+    books = bookorm.select_many(sql, True)
+    for book in books:
+        if bookupload.push_update_book(book):
+            print "PostInfo Ok %s %s" % (book.nid, book.bookName)
+        else:
+            print "PostInfo Fail %s %s" % (book.nid, book.bookName)
+    
 if __name__ == '__main__':
     # 抓取新数据
     #new_shot()
@@ -35,5 +53,11 @@ if __name__ == '__main__':
     # 抓取没有成功的数据
     #old_shot()
     
-    online()
-
+    # 打包
+    #move_zip()
+    
+    # 获取上传解压信息反馈
+    # get_upload_back()
+    
+    # 发送书籍信息
+    post_data()

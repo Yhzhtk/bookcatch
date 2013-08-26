@@ -17,11 +17,13 @@ bsize = 1024 * 100 # 块大小
 bnum = 0 # 块数量
 
 # POST参数
-book_post_url = "http://192.168.1.76:8080/NovelManager/addNovel"
-chapter_post_url = "http://192.168.1.76:8080/NovelManager/addChapter"
+http_con_pool = {} # http连接池
+post_host = "122.49.34.20:18111"
+book_post_url = "http://%s/ShotBook/addNovel" % post_host
+chapter_post_url = "http://%s/ShotBook/addChapter" % post_host
 
 def get_ftp(host, user = "book_ftp", pwd = "3$book@yicha#2013#"):
-    '''获取ftp连接'''
+    '''获取ftp连接，单线程的连接池'''
     if not host:
         host = default_ftp_host
     if ftp_pool.has_key(host):
@@ -144,6 +146,39 @@ def download_ftp_file(ftp_url, localname):
         traceback.print_exc()
         return False
 
+def get_http(host_port):
+    '''获取http连接，单线程的连接池'''
+    host = host_port[0] + ":" + host_port[1]
+    if http_con_pool.has_key(host):
+        conn = http_con_pool[host]
+        print "use conn pool"
+        return conn
+    
+    print "use new conn"
+    conn = None
+    if len(host_port) == 2:
+        conn = httplib.HTTPConnection(host_port[0], host_port[1], timeout=20)
+    else:
+        conn = httplib.HTTPConnection(host_port[0], timeout=20)
+    
+    if conn:
+        http_con_pool[host] = conn
+    return conn
+
+def remove_http(host_port):
+    host = host_port[0] + ":" + host_port[1]
+    if http_con_pool.has_key(host):
+        del http_con_pool[host] 
+
+def close_http():
+    if len(ftp_pool) > 0:
+        for host in http_con_pool.keys():
+            try:
+                ftp_pool[host].close()
+            except:
+                traceback.print_exc()
+    ftp_pool = {}
+
 def get_para_dict(obj, filter = None):
     '''获取发送的参数'''
     paras = {}
@@ -152,7 +187,7 @@ def get_para_dict(obj, filter = None):
     for (k,v) in obj.__dict__.items():
         if k in filter: # 判断是否是过滤的字段
             continue
-        paras[k] = str(v).encode("utf-8")
+        paras[k] = unicode(v).encode("utf-8")
     return paras
 
 def send_data(post_url, para_dict, headers = {"Content-Type" : "application/x-www-form-urlencoded"}):
@@ -161,10 +196,7 @@ def send_data(post_url, para_dict, headers = {"Content-Type" : "application/x-ww
         params = urllib.urlencode(para_dict)
         host_port, path = urllib.splithost(post_url.replace("http:", "").replace("https:", ""))
         host_port = host_port.split(":")
-        if len(host_port) == 2:
-            conn = httplib.HTTPConnection(host_port[0], host_port[1], timeout=20)
-        else:
-            conn = httplib.HTTPConnection(host_port[0], timeout=20)
+        conn = get_http(host_port)
         conn.request("POST", path, params, headers)
         response = conn.getresponse()
         res = False
@@ -172,10 +204,12 @@ def send_data(post_url, para_dict, headers = {"Content-Type" : "application/x-ww
         print response.status, rstr
         if rstr == "1":
             res = True
-        conn.close()
         return res
     except:
         traceback.print_exc()
+        close_http()
+        print "sleep 3 seconds"
+        time.sleep(3)
         return False
 
 def send_data_retry(post_url, obj, headers = {}, retry = 3):
@@ -200,11 +234,14 @@ def send_data_retry(post_url, obj, headers = {}, retry = 3):
 
 def push_bookinfo(book):
     '''发送书籍信息'''
+    print "=" * 50
     chapters = book.chapters
     for chapter in chapters:
+        print "-" * 50
         if not send_data_retry(chapter_post_url, chapter):
             print "send chapter fail, return Flase"
             return False
+        time.sleep(0.2)
     print "send all chapter ok", book.nid
     
     if not send_data_retry(book_post_url, book):
@@ -222,15 +259,31 @@ def push_update_book(book):
         return True
     return False
 
+def update_upload_book(ftp_url):
+    localname = "down/download%s.txt" % time.strftime("%y%m%d_%H%M%S")
+    if download_ftp_file(ftp_url, localname):
+        datas = open(localname, "r").readlines()
+        for data in datas:
+            infos = data.split("\t")
+            print "=" * 50, "\n", infos
+            if len(infos) == 4:
+                nid = os.path.basename(infos[1])[4:-4]
+                book = bookorm.get_book(nid)
+                if book.chapterok == 2:
+                    book.chapterok = 3
+                    book.upTime()
+                    bookorm.save_book(book)
+                    print "ok %s %s for update_upload_book" % (nid, book.bookName)
+                else:
+                    print "book chapterok is not 2, pass"
+
 if __name__ == '__main__':
-    #list_ftp(None, "/")
-    ftp_url = "/ebook/z.jpg"
-    localname = "d:/m.jpg"
-    upload_ftp_file(localname, ftp_url)
-    close_ftp()
+#     list_ftp(None, "/")
+#     ftp_url = "/ebook/z.jpg"
+#     localname = "d:/m.jpg"
+#     upload_ftp_file(localname, ftp_url)
+#     close_ftp()
 
-#     nid = "7738afd367cac04d3d52489a2a3e584e"
-#     book = bookorm.get_book(nid, True)
-#     print push_bookinfo(book)
-
-    
+    nid = "7738afd367cac04d3d52489a2a3e584e"
+    book = bookorm.get_book(nid, True)
+    print push_bookinfo(book)
