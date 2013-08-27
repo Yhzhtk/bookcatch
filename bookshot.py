@@ -7,8 +7,8 @@ Created on 2013-7-22
 
 import win32api,win32con,win32gui
 import time
-import ImageGrab
-import os
+import Image,ImageGrab
+import os, traceback
 import bookconfig,bookorm
 
 def move(loc):
@@ -57,6 +57,23 @@ def save(img, path, qualit=85):
     if not os.path.exists(os.path.split(path)[0]):
         os.makedirs(os.path.split(path)[0])
     img.save(path, 'JPEG', quality = qualit)
+
+def zoom_cover(cover_path):
+    try:
+        img = Image.open(cover_path)
+        size = os.path.getsize(cover_path) / 1024
+        qua = 70
+        if size > 20:
+            qua = 5
+        elif size > 15:
+            qua = 10
+        elif size > 10:
+            qua = 20
+        elif size > 5:
+            qua = 30
+        img.save(cover_path, 'JPEG', quality = qua)
+    except:
+        traceback.print_exc()
 
 def is_white(img):
     '''判断是否是全白色'''

@@ -59,8 +59,8 @@ def run_one_time(infile, outfile, destpath):
     faillines = []
     for i in range(len(lines)):
         line = lines[i]
-        if line:
-            infos = line.split("\t")
+        infos = line.split("\t")
+        if len(infos) == 3:
             print infos
             unzip(infos[0], "ebook/%s/" % infos[1], destpath)
             

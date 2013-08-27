@@ -4,7 +4,8 @@ Created on 2013-7-25
 一键完成流程
 @author: gudh
 '''
-import bookrun, bookorm, bookupload
+import bookrun, bookorm, bookupload, bookshot
+import os
 
 def new_shot():
     '''抓新书'''
@@ -45,7 +46,16 @@ def post_data():
             print "PostInfo Ok %s %s" % (book.nid, book.bookName)
         else:
             print "PostInfo Fail %s %s" % (book.nid, book.bookName)
-    
+
+def deal_cover():
+    path = "d:/img"
+    for root, dirs, files in os.walk(path): 
+        for f in files:
+            if f.endswith(".jpg"):
+                fname = os.path.join(root, f)
+                print "deal cover %s" % fname
+                bookshot.zoom_cover(fname)
+
 if __name__ == '__main__':
     # 抓取新数据
     #new_shot()
@@ -60,4 +70,7 @@ if __name__ == '__main__':
     # get_upload_back()
     
     # 发送书籍信息
-    post_data()
+    # post_data()
+    
+    # 处理封面
+    deal_cover()

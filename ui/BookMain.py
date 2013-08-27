@@ -9,7 +9,7 @@ from PyQt4.QtCore import pyqtSignature,Qt
 from Ui_BookMain import Ui_MainWindow
 import os 
 # yh.book指上级目录，包就没放进来了
-from yh.book import bookmode,bookorm,bookconfig,bookcrawl
+from yh.book import bookmode,bookorm,bookconfig,bookcrawl,bookshot
 
 day_path = bookconfig.rootpath + "%s/"  # 测试使用路径
 col_num = bookconfig.col_num # 默认选图列数
@@ -464,6 +464,8 @@ class BookMain(QMainWindow, Ui_MainWindow):
             cover_path = day_path % date + "cover/" + nid[0:2] + "/" + nid[2:4] + "/"
             print "cover path:", cover_path
             res = bookcrawl.supply_cover_img(cover_path)
+            # 压缩封面
+            bookshot.zoom_cover(cover_path)
             self.show_status(self.decode_file("处理封面信息" + res))
         except Exception, e:
             self.show_status(self.decode_file("处理封面信息失败：" + str(e)))

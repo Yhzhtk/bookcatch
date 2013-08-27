@@ -117,6 +117,8 @@ def del_cover(path):
         dect = (40, 0, 240, 280)
         im = im.crop(dect)
         bookshot.save(im, path)
+        # 压缩图片
+        bookshot.zoom_cover(path)
 
 def crawl_book(bookId):
     '''抓取并解析书的信息'''
