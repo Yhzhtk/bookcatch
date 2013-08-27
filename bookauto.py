@@ -39,7 +39,7 @@ def get_upload_back():
 
 def post_data():
     '''发送书籍信息'''
-    sql = "select * from shotbook where dohost = 'A1' and chapterok = 3 and nid = '' order by createTime limit 2"
+    sql = "select * from shotbook where dohost = 'A1' and chapterok = 3 order by createTime"
     books = bookorm.select_many(sql, True)
     for book in books:
         if bookupload.push_update_book(book):
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     #new_shot()
     
     # 抓取没有成功的数据
-    #old_shot()
+    old_shot()
     
     # 打包
     #move_zip()
@@ -73,4 +73,4 @@ if __name__ == '__main__':
     # post_data()
     
     # 处理封面
-    deal_cover()
+    # deal_cover()

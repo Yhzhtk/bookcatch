@@ -171,13 +171,13 @@ def remove_http(host_port):
         del http_con_pool[host] 
 
 def close_http():
-    if len(ftp_pool) > 0:
+    if len(http_con_pool) > 0:
         for host in http_con_pool.keys():
             try:
-                ftp_pool[host].close()
+                http_con_pool[host].close()
             except:
                 traceback.print_exc()
-    ftp_pool = {}
+    http_con_pool = {}
 
 def get_para_dict(obj, filter = None):
     '''获取发送的参数'''
@@ -207,9 +207,9 @@ def send_data(post_url, para_dict, headers = {"Content-Type" : "application/x-ww
         return res
     except:
         traceback.print_exc()
-        close_http()
-        print "sleep 3 seconds"
-        time.sleep(3)
+        remove_http(host_port)
+        print "sleep 6 seconds"
+        time.sleep(6)
         return False
 
 def send_data_retry(post_url, obj, headers = {}, retry = 3):
@@ -241,7 +241,7 @@ def push_bookinfo(book):
         if not send_data_retry(chapter_post_url, chapter):
             print "send chapter fail, return Flase"
             return False
-        time.sleep(0.2)
+        #time.sleep(0.2)
     print "send all chapter ok", book.nid
     
     if not send_data_retry(book_post_url, book):
