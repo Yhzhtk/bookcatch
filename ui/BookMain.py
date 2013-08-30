@@ -91,7 +91,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
     def __show_bookinfo(self, book):
         '''显示书的信息'''
         self.nidEdit.setText(book.nid)
-        self.nidEdit.setEnabled(False)
+        self.nidEdit.setReadOnly(True)
         date = book.createTime[0:10].replace("-", "")
         cover_path = day_path % date + "cover/" + book.nid[0:2] + "/" + book.nid[2:4] + "/" + book.nid[4:] + ".jpg"
         self.coverImgLabel.setText(cover_path)
@@ -102,7 +102,7 @@ class BookMain(QMainWindow, Ui_MainWindow):
         self.typeEdit.setText(book.type)
         self.descriptionEdit.setText(book.description)
         self.createTimeEdit.setText(book.createTime)
-        self.createTimeEdit.setEnabled(False)
+        self.createTimeEdit.setReadOnly(True)
     
     def __refresh_chap_count(self, update_index):
         '''更新章节数量'''
