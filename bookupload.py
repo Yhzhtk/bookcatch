@@ -259,6 +259,32 @@ def push_update_book(book):
         return True
     return False
 
+def upload_upload_file(ftp_url, upload_file):
+    '''上传upload.txt文件，获取源文件是否有数据，有的话先拼接'''
+    localname = "down/upload%s.txt" % time.strftime("%y%m%d_%H%M%S")
+    try:
+        print u"开始下载数据"
+        if download_ftp_file(ftp_url, localname):
+            # 拼接数据
+            datas = open(localname, "r").readlines()
+            datas = [l for l in datas if l.strip() != ""]
+            print u"开始合并数据"
+            upfile = open(upload_file, "a") 
+            for data in datas:
+                upfile.write(data)
+                print u"添加行%s" % data 
+            upfile.close()
+            # 上传upload.txt
+            if upload_ftp_file(upload_file, ftp_url):
+                print u"上传upload成功"
+            else:
+                print u"上传失败，请联系管理员"
+        else:
+            print u"下载书籍失败，请联系管理员"
+    except:
+        traceback.print_exc()
+        print u"上传失败，请联系管理员"
+
 def update_upload_book(ftp_url):
     localname = "down/download%s.txt" % time.strftime("%y%m%d_%H%M%S")
     if download_ftp_file(ftp_url, localname):

@@ -49,7 +49,7 @@ def write_file(filename, line):
     file.writelines(line)
     file.close()
 
-def run_one_time(infile, outfile, destpath):
+def run_one_time(infile = "/ftp/upload.txt", outfile = "/ftp/download.txt", destpath = "/data/ebook/"):
     '''through file get info, zip and write file'''
     file = open(infile, "r")
     lines = file.readlines()
@@ -82,7 +82,7 @@ def run_one_time(infile, outfile, destpath):
     
 def run(intxt, outtxt, destpath):
     '''run'''
-    try:
+    try: 
         run_one_time(intxt, outtxt, destpath)
     except:
         traceback.print_exc()
