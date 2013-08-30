@@ -90,18 +90,19 @@ def complete(id_seq_file):
         book.upTime()
         bookorm.insert_book_chapter(book)
 
-def move_zip_book(book):
+def move_zip_book(book, zip_path):
     '''上线书籍'''
     print "=" * 50
     print u"%s %s" % (book.nid, book.bookName)
     print u"1、开始分章移动更新"
     if bookimg.move_update_book(book):
         print u"分章移动更新更新成功"
-        zip_file = "nid_%s.zip" % book.nid
+        zip_file = "%s/nid_%s.zip" % (zip_path, book.nid)
         print u"2、开始打包zip： %s" % zip_file
         if bookimg.zip_book(book, zip_file):
             print u"打包书籍成功"
-            line = "/ftp/ebook_zip/%s\t%s\t%d\n" % (zip_file, book.createTime[0:10].replace("-", ""), (2 * book.imgCount + 1))
+            name = os.path.basename(zip_file)
+            line = "/ftp/ebook_zip/%s\t%s\t%d\n" % (name, book.createTime[0:10].replace("-", ""), (2 * book.imgCount + 1))
             file = open(bookconfig.uploadfile, "a")
             file.write(line)
             file.close()

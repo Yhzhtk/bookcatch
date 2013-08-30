@@ -24,7 +24,3 @@ def get_addbook_url(bookId):
 
 def get_book_url(bookId):
     return bookurl % bookId
-
-
-
-

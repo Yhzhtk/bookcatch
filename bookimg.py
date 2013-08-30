@@ -29,6 +29,8 @@ def zip_file(src, zip_file):
 def zip_files(srcs, zip_file):
     '''打包一个文件'''
     print u"打包 %d 个文件到 %s" % (len(srcs), zip_file)
+    if not os.path.exists(os.path.dirname(zip_file)):
+        os.makedirs(os.path.dirname(zip_file))
     start = time.clock()
     f = zipfile.ZipFile(zip_file, 'w', zipfile.ZIP_DEFLATED)
     for src in srcs:
@@ -179,4 +181,5 @@ def move_update_book(book):
     
     return False
 
-#move_book_back(r"F:\ebook\20130806\content\l\e1\8a\d7dfdb59aa985687ebe71220f6d5/")
+if __name__ == '__main__':
+    move_book_back(r"F:\ebook\20130806\content\l\e1\8a\d7dfdb59aa985687ebe71220f6d5/")

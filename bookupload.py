@@ -261,19 +261,30 @@ def push_update_book(book):
 
 def upload_upload_file(ftp_url, upload_file):
     '''上传upload.txt文件，获取源文件是否有数据，有的话先拼接'''
-    localname = "down/upload%s.txt" % time.strftime("%y%m%d_%H%M%S")
+    localname = "c:/down/upload%s.txt" % time.strftime("%y%m%d_%H%M%S")
     try:
         print u"开始下载数据"
         if download_ftp_file(ftp_url, localname):
             # 拼接数据
-            datas = open(localname, "r").readlines()
-            datas = [l for l in datas if l.strip() != ""]
             print u"开始合并数据"
-            upfile = open(upload_file, "a") 
+            df = open(localname, "r")
+            datas = df.readlines()
+            datas = [l for l in datas if l.strip() != ""]
+            df.close()
+            uf = open(upload_file, "r")
+            t_datas = uf.readlines()
+            uf.close()
+            
+            # 合并去重
+            datas.extend(t_datas)
+            datas = set(datas)
+            upfile = open(upload_file, "w")
             for data in datas:
                 upfile.write(data)
-                print u"添加行%s" % data 
+                print u"行%s" % data 
             upfile.close()
+            print u"共有数据条数：%d" % len(datas) 
+            
             # 上传upload.txt
             if upload_ftp_file(upload_file, ftp_url):
                 print u"上传upload成功"
@@ -286,7 +297,7 @@ def upload_upload_file(ftp_url, upload_file):
         print u"上传失败，请联系管理员"
 
 def update_upload_book(ftp_url):
-    localname = "down/download%s.txt" % time.strftime("%y%m%d_%H%M%S")
+    localname = "c:/down/download%s.txt" % time.strftime("%y%m%d_%H%M%S")
     if download_ftp_file(ftp_url, localname):
         datas = open(localname, "r").readlines()
         for data in datas:
