@@ -68,16 +68,17 @@ def run_retask():
 def move_daily():
     '''move log daily'''
     write_log("==========================")
-    if os.path.exists(intxt):
-        dest = "/ftp/tool/log/upload%s.txt" % time.strftime("%y%m%d%H%M%S")
-        write_log("move %s to %s" % (intxt, dest))
-        os.rename(intxt, dest)
+#     if os.path.exists(intxt):
+#         dest = "/ftp/tool/log/upload%s.txt" % time.strftime("%y%m%d%H%M%S")
+#         write_log("move %s to %s" % (intxt, dest))
+#         os.rename(intxt, dest)
+#     open(intxt, "w").close()
+#     os.chmod(intxt, stat.S_IRWXU|stat.S_IRWXG|stat.S_IRWXO)
     if os.path.exists(outtxt):
         dest = "/ftp/tool/log/download%s.txt" % time.strftime("%y%m%d%H%M%S")
         write_log("move %s to %s" % (outtxt, dest))
         os.rename(outtxt, dest)
-    open(intxt, "w").close()
-    os.chmod(intxt, stat.S_IRWXU|stat.S_IRWXG|stat.S_IRWXO)
+
         
 if __name__ == '__main__':
     #deal_cover("")
