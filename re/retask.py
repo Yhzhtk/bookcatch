@@ -27,22 +27,27 @@ def unzip(src, dest_rep_from, dest_rep_to):
     except:
         traceback.print_exc() 
 
-def get_jpg_count(path):
+def get_jpg_count(paths):
     '''get path file count'''
+    path = paths[0]
     handle = subprocess.Popen('find %s | grep .jpg | wc -l' % path, stdout=subprocess.PIPE, shell=True)
     res = handle.stdout.read()
-    print "path jpg count: %s" % res
-    return int(res)
+    ac = int(res)
+    if os.path.exists(paths[1]):
+        ac += 1
+    print "path jpg count: %s" % ac
+    return ac
 
 def get_book_path(destpath, nid):
     '''get book high low cover path'''
     npath = "%s/%s/%s" % (nid[0:2], nid[2:4], nid[4:])
     hpath = "%scontent/%s/%s" % (destpath, "h", npath)
     lpath = "%scontent/%s/%s" % (destpath, "l", npath)
-    cpath = "%scover/%s/%s" % (destpath, nid[0:2], nid[2:4])
-    all_bookdir = "%s %s %s" % (hpath, lpath, cpath)
+    cpath = "%scover/%s/%s/%s.jpg" % (destpath, nid[0:2], nid[2:4], nid[4:])
+    all_bookdir = "%s %s" % (hpath, lpath)
     print "GET JPG PATH: %s" % all_bookdir
-    return all_bookdir
+    print "COVER PATH: %s" % cpath
+    return (all_bookdir, cpath)
 
 def write_file(filename, line):
     file = open(filename, "a")
