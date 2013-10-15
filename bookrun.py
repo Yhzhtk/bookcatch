@@ -28,11 +28,20 @@ def shot_cates(args):
     err_num = 0
     # 循环拍书
     for book_id in book_ids:
+        if not shot_one_book(book_id):
+            err_num += 1
+            if err_num >= 5:
+                print "连续失败书过多，结束拍书"
+                return
+
+def shot_one_book(book_id):
+    '''抓一本书，返回是否成功'''
+    try:
         print "=" * 50
         # 如果存在则跳过
         if bookorm.exist_book(book_id):
             print "%s has exist, continue" % book_id
-            continue
+            return True
         # 开始抓取
         print "begin crawl : %s" % book_id
         book = bookcrawl.crawl_book(book_id)
@@ -46,17 +55,18 @@ def shot_cates(args):
                     if d_t < 15:
                         d_t = 15
                     if not bookshot.shot_first_book(book, down_time=d_t):
-                        err_num += 1
-                        if err_num >= 5:
-                            print "连续失败书过多，结束拍书"
-                            return
+                        return False
                 else:
                     print "insert book fail: %s" % book_id
             else:
                 print "add book to lebook fail: " + book_id
         else:
             print "crawl book fail: " + book_id
-            
+    except:
+        traceback.print_stack()
+        return False
+    return True
+
 def shot_no_success(id_seq_file):
     '''抓取已经添加但没成功的书籍'''
     lines = open(id_seq_file, "r").read().split("\n")

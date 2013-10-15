@@ -72,13 +72,16 @@ def insert_book_chapter(book):
         
         chapters = book.chapters
         # 获取插入语句
-        sql = get_insert_sql(bookconfig.chapter_table_name, chapters[0], chapters[0].filter)
-        print sql
-        
-        for chapter in chapters:
-            # 循环插入数据
-            paras = get_insert_paras(chapter, chapter.filter)
-            cur.execute(sql, paras)
+        try:
+            sql = get_insert_sql(bookconfig.chapter_table_name, chapters[0], chapters[0].filter)
+            print sql
+            
+            for chapter in chapters:
+                # 循环插入数据
+                paras = get_insert_paras(chapter, chapter.filter)
+                cur.execute(sql, paras)
+        except:
+            print "There is not any chapters, pass"
 
         conn.commit()
         cur.close()
